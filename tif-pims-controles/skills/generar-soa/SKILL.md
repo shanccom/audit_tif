@@ -21,6 +21,7 @@ No se ejecuta para: consultas sobre un solo control (usar `verificar-controles`)
 - riesgos: lista de { id, descripcion, controles[] }        (de Agente de Riesgos)
 - evidencias: lista de { control, descripcion, estado }      (de Agente de Evidencia)
   con estado = implementado | parcial
+- base_politicas: repositorio corporativo de políticas y directivas (indexado en knowledge/politicas/)
 
 ## Pasos
 1. Validar la entrada. Si falta perfil.rol o no es válido, rechazar con estado
