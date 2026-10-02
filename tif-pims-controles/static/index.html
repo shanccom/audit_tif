@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agente de Controles – PIMS ISO/IEC 27701:2025</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Agente de Controles (SoA) – PIMS</h1>
+      <p class="sub">Sistema de Gestión de Información de Privacidad · ISO/IEC 27701:2025</p>
+    </header>
+
+    <div class="card">
+      <label for="operacion">Operación del Agente</label>
+      <select id="operacion">
+        <option value="generar_soa">Generar Declaración de Aplicabilidad (SoA)</option>
+        <option value="verificar_control">Verificar Control Puntual</option>
+        <option value="consultar">Consultar Base Normativa (RAG)</option>
+      </select>
+
+      <label for="entrada">Payload de Entrada (JSON)</label>
+      <textarea id="entrada" rows="14"></textarea>
+
+      <div class="actions">
+        <button id="ejecutar">Ejecutar Operación</button>
+      </div>
+    </div>
+
+    <section id="resultado" class="card" style="display: none;"></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
