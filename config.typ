@@ -1,7 +1,7 @@
 //  CONFIGURACIÓN DEL INFORME  (aquí cambias todo, no en el texto)
 
 // --- Portada: datos ---
-#let curso    = "Auditoría de Tecnologías de la Información"
+#let curso    = "Auditoría de Sistemas (1704255)"
 #let titulo   = "Agente de Controles y SoA para PIMS ISO/IEC 27701:2025"
 #let subtitulo = "TIF – Primera Parte: De Prompt a Skill en Sistemas Multi-Agente"
 
@@ -12,9 +12,9 @@
   "Garambel Marin Fernando Miguel",
   "Hanco Mullisaca Sergio Danilo",
 )
-#let docente = "Docente de la Asignatura"
+#let docente = "Mg. Edward Vicente Zárate Carlos"
 #let lugar   = "Arequipa, Perú"
-#let fecha   = "01 de Octubre de 2026"
+#let fecha   = "02 de Octubre de 2026"
 
 // --- Encabezado e imágenes (aparece en todas las páginas) ---
 #let facultad         = "FACULTAD DE INGENIERÍA DE PRODUCCIÓN Y SERVICIOS"

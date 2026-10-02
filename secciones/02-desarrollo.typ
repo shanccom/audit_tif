@@ -17,9 +17,9 @@ En las etapas iniciales de la adopción de inteligencia artificial en auditoría
   [Reusabilidad], [Requiere reescribir y refinar la instrucción en cada consulta], [Invocación modular estandarizada por humanos o por el orquestador]
 )
 
-=== Transformación del Caso 1: Elaboración de la SoA
-- *Prompt Original:* _"Con esta información de mi organización, dime qué controles de ISO 27701 aplican, por qué, y en qué estado de implementación están."_
-- *Skill Resultante (`generar-soa`):* Procedimiento formal que valida el rol (`responsable`, `encargado`, `ambos`), analiza los riesgos vinculados, computa el estado de implementación a partir de la matriz de evidencias, consulta políticas en FAISS y emite la SoA completa junto al resumen de brechas y la bandera obligatoria de supervisión humana (`requiere_revision_humana = true`).
+=== Transformación del Caso 1: Elaboración de la SoA y Mapeo de Políticas a Controles
+- *Prompt Original:* _"Tengo estas políticas de privacidad de mi organización y necesito saber qué controles de ISO 27701 aplican, qué directrices internas los respaldan y en qué estado de cumplimiento estamos."_
+- *Skill Resultante (`generar-soa`):* Procedimiento formal que valida el rol (`responsable`, `encargado`, `ambos`), analiza los riesgos vinculados, computa el estado de implementación a partir de la matriz de evidencias, ejecuta búsqueda semántica vectorial (FAISS) sobre el repositorio corporativo para asociar cláusulas de políticas a cada control, y emite la SoA completa junto al resumen de brechas y la bandera obligatoria de supervisión humana (`requiere_revision_humana = true`).
 
 === Transformación del Caso 2: Auditoría de un Control Específico
 - *Prompt Original:* _"Revisa si el control de DPIA está realmente implementado con estas evidencias y dime qué falta."_
@@ -37,6 +37,7 @@ Los Skills se definen siguiendo el estándar de especificación de agentes, alma
   - `perfil`: `{ organizacion: string, rol: "responsable" | "encargado" | "ambos" }`
   - `riesgos`: Lista de `{ id: string, descripcion: string, controles: string[] }`
   - `evidencias`: Lista de `{ control: string, descripcion: string, estado: "implementado" | "parcial" }`
+  - `base_politicas`: Repositorio corporativo de políticas y directivas internas (indexado en `knowledge/politicas/`).
 - *Algoritmo de Ejecución:*
   1. Validar la obligatoriedad y formato del rol. Si es inválido, abortar con estado `"rechazada"`.
   2. Cargar el catálogo normativo oficial (`catalogo_controles.json`).

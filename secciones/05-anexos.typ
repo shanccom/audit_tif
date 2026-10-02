@@ -47,6 +47,7 @@ No se ejecuta para: consultas sobre un solo control (usar `verificar-controles`)
 - riesgos: lista de { id, descripcion, controles[] }        (de Agente de Riesgos)
 - evidencias: lista de { control, descripcion, estado }      (de Agente de Evidencia)
   con estado = implementado | parcial
+- base_politicas: repositorio corporativo de políticas y directivas (indexado en knowledge/politicas/)
 
 ## Pasos
 1. Validar la entrada. Si falta perfil.rol o no es válido, rechazar con estado "rechazada".
@@ -147,13 +148,22 @@ class Indice:
         ]
 
 def desde_carpeta(carpeta):
+    """Lee los .md de una carpeta y los parte por párrafos extrayendo su identificador."""
     textos, metas = [], []
     for ruta in sorted(glob.glob(os.path.join(carpeta, "*.md"))):
         with open(ruta, encoding="utf-8") as f:
             for parte in f.read().split("\n\n"):
-                if parte.strip():
-                    textos.append(parte.strip())
-                    metas.append(os.path.basename(ruta))
+                p = parte.strip()
+                if p:
+                    textos.append(p)
+                    primera_linea = p.split("\n")[0].replace("#", "").strip()
+                    if ":" in primera_linea and len(primera_linea.split(":")[0]) < 80:
+                        meta_label = primera_linea.split(":")[0].strip()
+                    elif len(primera_linea) < 70:
+                        meta_label = primera_linea
+                    else:
+                        meta_label = os.path.basename(ruta)
+                    metas.append(meta_label)
     return Indice(textos, metas)
 ```
 
