@@ -33,42 +33,54 @@ const POLITICAS_MAP = {
   "A.3.17": "Política UNSA - Datos de Docentes, Personal y Aula Virtual"
 };
 
-// Evidencias Documentales Oficiales de la UNSA (Archivos Reales)
+// Evidencias Documentales Oficiales de la UNSA (Archivos Reales en knowledge/evidencias/)
 let evidenciasDocumentadas = [
   {
     control: "A.1.2.2",
     archivo: "reglamento_matricula_2020_modi.pdf",
-    descripcion: "Reglamento General de Matrícula de la UNSA: Fines académicos legítimos, deberes de estudiantes y registro en SISUNSA",
+    descripcion: "Reglamento General de Matrícula (RCU N° 0127-2020): Fines académicos legítimos, deberes de estudiantes y registro en SISUNSA",
+    estado: "implementado"
+  },
+  {
+    control: "A.1.2.2",
+    archivo: "Declaracion-Jurada-Admision-Mayor-Edad.pdf",
+    descripcion: "SISADMISION: Cláusula de consentimiento informado previo y tratamiento biométrico de postulantes (DUA-UNSA)",
     estado: "implementado"
   },
   {
     control: "A.1.2.9",
-    archivo: "Protección de Datos Personales - UNSA.html",
-    descripcion: "Registro oficial de Bancos de Datos Personales (Estudiantes, Postulantes, Docentes, Egresados, Comedor)",
-    estado: "implementado"
-  },
-  {
-    control: "A.1.3.7",
-    archivo: "Protección de Datos Personales - UNSA.html",
-    descripcion: "Procedimiento oficial de Derechos ARCO ante Secretaría General (San Agustín 115) y odp@unsa.edu.pe",
+    archivo: "Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf",
+    descripcion: "Resoluciones de Consejo Universitario (RCU 0127-2020, RCU 0009-2026): Registro oficial RAT de bancos de datos SISUNSA y Campus Virtual",
     estado: "implementado"
   },
   {
     control: "A.1.2.6",
-    archivo: "DPIA-Biometria-Comedor-Borrador.docx",
-    descripcion: "Evaluación preliminar de impacto para validación socioeconómica y huellas dactilares en Comedor Universitario",
+    archivo: "RCU-0127-2025-Reglamento-Comedor-Universitario.pdf",
+    descripcion: "Reglamento de Comedor Universitario (RCU N° 0127-2025 - DUDE): DPIA para validación socioeconómica y huellas dactilares de comensales",
     estado: "parcial"
+  },
+  {
+    control: "A.1.3.7",
+    archivo: "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+    descripcion: "TUPA Institucional: Procedimiento oficial de Derechos ARCO ante Secretaría General (San Agustín 115) y odp@unsa.edu.pe",
+    estado: "implementado"
+  },
+  {
+    control: "A.1.3.9",
+    archivo: "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+    descripcion: "TUPA Institucional: Expedición de constancias y copia legible de PII para estudiantes y egresados agustinos",
+    estado: "implementado"
   },
   {
     control: "A.1.2.7",
     archivo: "Contrato-DPA-Google-Workspace-UNSA.pdf",
-    descripcion: "Acuerdo de Protección de Datos y transferencia bajo convenio para el servicio educativo y correos @unsa.edu.pe",
+    descripcion: "Acuerdo de Protección de Datos (DPA) para servicio de correo @unsa.edu.pe y almacenamiento educativo",
     estado: "implementado"
   },
   {
     control: "A.3.12",
     archivo: "Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx",
-    descripcion: "Borrador de protocolo de contención y contingencia ante brechas en banco de datos Seguridad y Vigilancia",
+    descripcion: "Borrador de protocolo de contención y contingencia ante brechas en banco de datos Seguridad y Vigilancia (OTI-UNSA)",
     estado: "parcial"
   }
 ];
