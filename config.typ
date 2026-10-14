@@ -7,9 +7,9 @@
 
 #let integrantes = (
   "Ajra Huasco Jeans Anthony",
-  "Gutierrez Ccam Juan Diego",
+  "Gutierrez Ccama Juan Diego",
   "Suclle Suca Michael Benjamin",
-  "Garambel Marin Fernando Miguel",
+  "Garambel Marín Fernando Miguel",
   "Hanco Mullisaca Sergio Danilo",
 )
 #let docente = "Mg. Edward Vicente Zárate Carlos"
