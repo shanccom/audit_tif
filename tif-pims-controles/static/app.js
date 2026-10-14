@@ -1,5 +1,6 @@
 // Sistema de Auditoría PIMS - ISO/IEC 27701:2025
 // Universidad Nacional de San Agustín de Arequipa (UNSA)
+// Motor de Frontend y Gestión de Usabilidad
 
 const API_BASE = (window.location.protocol === "file:" || !window.location.port)
   ? "http://127.0.0.1:5000"
@@ -106,17 +107,20 @@ const riesgosUNSA = [
 
 let catalogoActual = CATALOGO_BASE;
 let filtroTablaSoA = "todos";
+let busquedaFiltroSoA = "";
 let resultadoSoAUltimo = null;
 let servidorOnline = false;
 
-// Inicialización
+// Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", async () => {
   initNavegacionPestanas();
   initSelectorRoles();
+  initModalGuia();
   renderRiesgosResumen();
   renderTablaEvidencias();
   initFormularioNuevaEvidencia();
   initPresetsJSON();
+  initBuscadorSoA();
   await verificarConexionServidor();
   poblarSelectsControles();
 
@@ -127,7 +131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btn-imprimir-reporte").addEventListener("click", () => window.print());
 });
 
-// 1. Verificación de Conectividad con Flask
+// 1. Verificación de Conectividad con el Backend Flask
 async function verificarConexionServidor() {
   const statusDot = document.getElementById("status-dot");
   const statusText = document.getElementById("status-text");
@@ -139,12 +143,12 @@ async function verificarConexionServidor() {
       servidorOnline = true;
       catalogoActual = await res.json();
       statusDot.className = "status-dot online";
-      statusText.textContent = "Agente en Línea (API :5000)";
+      statusText.textContent = "Agente Conectado (:5000)";
       serverAlert.style.display = "none";
       return;
     }
   } catch (err) {
-    // Servidor no disponible
+    // Backend no disponible
   }
 
   servidorOnline = false;
@@ -167,7 +171,7 @@ function initNavegacionPestanas() {
   });
 }
 
-// 3. Selector de Roles
+// 3. Selector de Roles (Tarjetas Interactivas)
 function initSelectorRoles() {
   const radios = document.querySelectorAll("input[name='rol-eval']");
   radios.forEach(r => {
@@ -184,7 +188,32 @@ function obtenerRolSeleccionado() {
   return checked ? checked.value : "responsable";
 }
 
-// 4. Renderizado de Riesgos
+// 4. Modal de Guía Rápida de Usabilidad
+function initModalGuia() {
+  const btnAbrir = document.getElementById("btn-abrir-guia");
+  const btnCerrar = document.getElementById("btn-cerrar-guia");
+  const modal = document.getElementById("modal-guia");
+
+  if (btnAbrir && modal) {
+    btnAbrir.addEventListener("click", () => {
+      modal.style.display = "flex";
+    });
+  }
+
+  if (btnCerrar && modal) {
+    btnCerrar.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+  }
+}
+
+// 5. Renderizado de Riesgos
 function renderRiesgosResumen() {
   const box = document.getElementById("contenedor-riesgos-resumen");
   if (!box) return;
@@ -192,19 +221,28 @@ function renderRiesgosResumen() {
   riesgosUNSA.forEach(r => {
     const item = document.createElement("div");
     item.className = "risk-summary-item";
-    item.innerHTML = `<strong>${r.id}:</strong> ${r.descripcion} <br/><span class="agent-tag">Controles requeridos: ${r.controles.join(", ")}</span>`;
+    item.innerHTML = `
+      <div><span class="risk-id-tag">${r.id}</span> <strong>${r.descripcion}</strong></div>
+      <div><span class="agent-tag">Controles requeridos: ${r.controles.join(", ")}</span></div>
+    `;
     box.appendChild(item);
   });
 }
 
-// 5. Lista Espaciosa de Artefactos Probatorios
+// 6. Lista de Artefactos Probatorios
 function renderTablaEvidencias() {
   const container = document.getElementById("contenedor-artefactos");
+  const totalLbl = document.getElementById("lbl-total-evidencias");
   if (!container) return;
+
+  if (totalLbl) {
+    totalLbl.textContent = `${evidenciasDocumentadas.length} documentos registrados`;
+  }
+
   container.innerHTML = "";
 
   if (evidenciasDocumentadas.length === 0) {
-    container.innerHTML = `<div class="empty-artifacts">No hay artefactos documentados registrados para este ciclo de auditoría.</div>`;
+    container.innerHTML = `<div class="empty-artifacts">No hay artefactos probatorios registrados para este ciclo de auditoría.</div>`;
     return;
   }
 
@@ -212,20 +250,19 @@ function renderTablaEvidencias() {
     const card = document.createElement("div");
     card.className = "artifact-card";
     
-    // Extensión del archivo para la etiqueta de formato
     const extension = e.archivo.split(".").pop().toUpperCase();
-    const textoEstado = e.estado === "implementado" ? "Documento Oficial Vigente" : "Borrador en Revisión";
+    const textoEstado = e.estado === "implementado" ? "Oficial Vigente" : "Borrador";
 
     card.innerHTML = `
       <div class="artifact-header-row">
         <div class="artifact-title-group">
           <span class="file-ext-tag">${extension}</span>
-          <span class="artifact-filename">${e.archivo}</span>
+          <span class="artifact-filename" title="${e.archivo}">${e.archivo}</span>
           <span class="artifact-control-badge">Control ${e.control}</span>
         </div>
         <div class="artifact-actions-group">
           <span class="artifact-status-pill">${textoEstado}</span>
-          <button class="btn-del-artifact" data-index="${idx}" title="Eliminar este documento de la auditoría">Eliminar</button>
+          <button class="btn-del-artifact" data-index="${idx}" title="Eliminar este documento">Eliminar</button>
         </div>
       </div>
       <div class="artifact-description-text">${e.descripcion}</div>
@@ -241,7 +278,7 @@ function renderTablaEvidencias() {
   });
 }
 
-// 6. Formulario para Agregar Evidencias
+// 7. Formulario para Agregar Evidencias
 function initFormularioNuevaEvidencia() {
   const btnAbrir = document.getElementById("btn-abrir-modal-evidencia");
   const subform = document.getElementById("form-registro-rapido");
@@ -303,8 +340,13 @@ function poblarSelectsControles() {
   });
 }
 
-// 7. Ejecutar Evaluación de la SoA
+// 8. Ejecutar Evaluación de la SoA
 async function ejecutarSoA() {
+  const btn = document.getElementById("btn-generar-soa");
+  const originalText = btn.innerHTML;
+  btn.innerHTML = "<span>⏳ Procesando Evaluación...</span>";
+  btn.disabled = true;
+
   const org = document.getElementById("input-org").value.trim() || "Universidad Nacional de San Agustín (UNSA)";
   const rol = obtenerRolSeleccionado();
 
@@ -319,10 +361,15 @@ async function ejecutarSoA() {
     }))
   };
 
-  await procesarPayload(payload);
+  try {
+    await procesarPayload(payload);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
 }
 
-// 8. Procesamiento con Fallback Determinista Inteligente
+// 9. Procesamiento con Fallback Determinista Inteligente
 async function procesarPayload(payload) {
   let resultado = null;
 
@@ -349,7 +396,7 @@ async function procesarPayload(payload) {
   renderizarResultadosSoA(resultado);
 }
 
-// Motor Determinista de Contingencia en JavaScript (Misma lógica matemática que agentes/controles.py)
+// Motor Determinista Local de Contingencia
 function ejecutarMotorLocal(entrada) {
   const operacion = entrada.operacion || "generar_soa";
   const perfil = entrada.perfil || {};
@@ -436,13 +483,11 @@ function evaluarFilaControl(control, rol, riesgos, evidencias) {
     }
   }
 
-  // Vincular Riesgos
   const vinculados = riesgos.filter(r => (r.controles || []).includes(control.id)).map(r => r.id);
   if (aplica && vinculados.length > 0) {
     justificacion += ` Vinculado a los riesgos: ${vinculados.join(", ")}.`;
   }
 
-  // Evaluar Evidencias
   let estado = "no aplica";
   let docs = [];
   if (aplica) {
@@ -474,11 +519,11 @@ function evaluarFilaControl(control, rol, riesgos, evidencias) {
 function recomendarAccion(fila) {
   if (!fila.aplica) return "Documentar el motivo formal de exclusión en la SoA.";
   if (fila.estado === "implementado") return "Mantener la evidencia vigente y archivarla para la auditoría interna (Cláusula 9.2).";
-  if (fila.estado === "parcial") return `Completar los requisitos pendientes y solicitar actualización al ${fila.responsable}.`;
+  if (fila.estado === "parcial") return `Completar los requisitos pendientes y coordinar con el ${fila.responsable}.`;
   return `Solicitar formalmente la evidencia documental al ${fila.responsable}.`;
 }
 
-// 9. Renderizar Resultados en Pantalla
+// 10. Renderizar Resultados en Pantalla
 function renderizarResultadosSoA(res) {
   const panel = document.getElementById("panel-resultados-soa");
   panel.style.display = "block";
@@ -500,12 +545,43 @@ function renderizarResultadosSoA(res) {
     document.getElementById("txt-count-brechas").textContent = r.no_implementados;
     document.getElementById("txt-count-imp").textContent = r.implementados;
     document.getElementById("txt-count-exc").textContent = r.excluidos;
+
+    // Actualización de la Barra de Cumplimiento
+    const aplicables = r.aplican || 1;
+    const pctImp = Math.round((r.implementados / aplicables) * 100);
+    const pctPar = Math.round((r.parciales / aplicables) * 100);
+    const pctBre = Math.round((r.no_implementados / aplicables) * 100);
+
+    const lblPct = document.getElementById("lbl-compliance-pct");
+    if (lblPct) {
+      lblPct.textContent = `${pctImp}% Conforme (${r.implementados}/${r.aplican} aplicables)`;
+    }
+
+    const barImp = document.getElementById("bar-imp");
+    const barPar = document.getElementById("bar-par");
+    const barBre = document.getElementById("bar-bre");
+    if (barImp) barImp.style.width = `${pctImp}%`;
+    if (barPar) barPar.style.width = `${pctPar}%`;
+    if (barBre) barBre.style.width = `${pctBre}%`;
   }
 
-  // Render Tabla y Brechas
-  renderFilasSoA(res.datos ? res.datos.soa : []);
+  const filas = res.datos ? res.datos.soa : [];
+  renderFilasSoA(filas);
   renderItemsBrechas(res.datos ? res.datos.brechas : []);
-  initFiltrosSoA(res.datos ? res.datos.soa : []);
+  initFiltrosSoA(filas);
+}
+
+// 11. Buscador en Vivo de la SoA
+function initBuscadorSoA() {
+  const searchInput = document.getElementById("input-buscar-soa");
+  if (!searchInput) return;
+
+  searchInput.addEventListener("input", (e) => {
+    busquedaFiltroSoA = e.target.value.trim().toLowerCase();
+    if (resultadoSoAUltimo && resultadoSoAUltimo.datos && resultadoSoAUltimo.datos.soa) {
+      renderFilasSoA(resultadoSoAUltimo.datos.soa);
+    }
+  });
 }
 
 function renderFilasSoA(filas) {
@@ -513,12 +589,29 @@ function renderFilasSoA(filas) {
   tbody.innerHTML = "";
 
   const filtradas = filas.filter(f => {
-    if (filtroTablaSoA === "todos") return true;
-    if (filtroTablaSoA === "brechas") return f.aplica && f.estado === "no implementado";
-    if (filtroTablaSoA === "implementados") return f.estado === "implementado";
-    if (filtroTablaSoA === "excluidos") return !f.aplica;
+    // 1. Filtro por píldoras
+    let pasaPildora = true;
+    if (filtroTablaSoA === "brechas") pasaPildora = (f.aplica && f.estado === "no implementado");
+    else if (filtroTablaSoA === "implementados") pasaPildora = (f.estado === "implementado");
+    else if (filtroTablaSoA === "excluidos") pasaPildora = (!f.aplica);
+
+    if (!pasaPildora) return false;
+
+    // 2. Filtro por buscador en vivo
+    if (busquedaFiltroSoA) {
+      const textoCompleto = `${f.control} ${f.nombre} ${f.justificacion} ${f.responsable} ${f.estado}`.toLowerCase();
+      if (!textoCompleto.includes(busquedaFiltroSoA)) return false;
+    }
+
     return true;
   });
+
+  if (filtradas.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="8" style="text-align:center; padding:24px; color:var(--slate-400);">No se encontraron controles que coincidan con el filtro actual.</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
 
   filtradas.forEach(f => {
     const tr = document.createElement("tr");
@@ -533,11 +626,11 @@ function renderFilasSoA(filas) {
       textoEstadoFormal = "En Proceso (Parcial)";
       statusClass = "audit-tag-proceso";
     } else if (f.estado === "no implementado") {
-      textoEstadoFormal = "Pendiente de Subsanación";
+      textoEstadoFormal = "Pendiente (Brecha)";
       statusClass = "audit-tag-pendiente";
     }
 
-    let textoEvidencias = "<span class='text-muted-subtle'>Sin documento registrado</span>";
+    let textoEvidencias = "<span class='text-muted-subtle'>Sin documento</span>";
     if (f.evidencias && f.evidencias.length > 0) {
       textoEvidencias = f.evidencias.map(doc => `<div class="doc-line-item">• ${doc}</div>`).join("");
     }
@@ -550,8 +643,8 @@ function renderFilasSoA(filas) {
     tr.innerHTML = `
       <td><span class="control-code">${f.control}</span></td>
       <td><strong>${f.nombre}</strong></td>
-      <td style="text-align:center;">${f.aplica ? "Sí" : "No"}</td>
-      <td style="color:#334155;">${f.justificacion}</td>
+      <td style="text-align:center;">${f.aplica ? '<span style="color:var(--emerald-600); font-weight:700;">Sí</span>' : '<span style="color:var(--slate-400);">No</span>'}</td>
+      <td style="color:var(--slate-700); line-height:1.4;">${f.justificacion}</td>
       <td><span class="audit-status-label ${statusClass}">${textoEstadoFormal}</span></td>
       <td>${textoEvidencias}</td>
       <td>${textoPolitica}</td>
@@ -567,7 +660,7 @@ function renderItemsBrechas(brechas) {
   container.innerHTML = "";
 
   if (!brechas || brechas.length === 0) {
-    container.innerHTML = "<p style='color:#065f46; font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
+    container.innerHTML = "<p style='color:var(--emerald-600); font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
     return;
   }
 
@@ -595,10 +688,11 @@ function initFiltrosSoA(filas) {
   });
 }
 
-// 10. Presets JSON
+// 12. Presets JSON y Copiado al Portapapeles
 function initPresetsJSON() {
   const select = document.getElementById("sel-preset-json");
   const txt = document.getElementById("txt-json-payload");
+  const btnCopiar = document.getElementById("btn-copiar-json-input");
 
   const presets = {
     unsa_responsable: {
@@ -643,6 +737,21 @@ function initPresetsJSON() {
 
   select.addEventListener("change", cargar);
   cargar();
+
+  if (btnCopiar) {
+    btnCopiar.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(txt.value);
+        const originalText = btnCopiar.innerHTML;
+        btnCopiar.innerHTML = `<span>✓ ¡Copiado al portapapeles!</span>`;
+        setTimeout(() => {
+          btnCopiar.innerHTML = originalText;
+        }, 2000);
+      } catch (err) {
+        alert("No se pudo copiar automáticamente. Por favor seleccione el texto manualmente.");
+      }
+    });
+  }
 }
 
 async function procesarJsonDirecto() {
