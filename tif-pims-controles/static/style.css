@@ -1231,3 +1231,237 @@ button {
   display: flex;
   gap: 10px;
 }
+
+/* ==========================================================================
+   11. Asistente Virtual de Privacidad (Chat IA Local / RAG)
+   ========================================================================== */
+
+.chat-suggestions-box {
+  background: #f8fafc;
+  border: 1px solid var(--slate-200);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.suggestions-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--slate-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.suggestions-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-btn {
+  background: #ffffff;
+  border: 1px solid var(--slate-300);
+  color: var(--slate-700);
+  font-size: 11.5px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.chip-btn:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  background: #fff5f6;
+  transform: translateY(-1px);
+}
+
+.chat-viewport {
+  height: 440px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.chat-bubble-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  max-width: 88%;
+}
+
+.chat-bubble-row.bot {
+  align-self: flex-start;
+}
+
+.chat-bubble-row.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.bot-avatar {
+  background: #fdf2f4;
+  border: 1px solid #fecdd3;
+}
+
+.user-avatar {
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+}
+
+.chat-bubble {
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  position: relative;
+}
+
+.bot-bubble {
+  background: #f8fafc;
+  border: 1px solid var(--slate-200);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  color: var(--slate-800);
+}
+
+.user-bubble {
+  background: var(--brand-primary);
+  color: #ffffff;
+  border-radius: 8px 8px 0 8px;
+}
+
+.bubble-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.bot-bubble .bubble-header strong {
+  color: var(--brand-primary);
+}
+
+.user-bubble .bubble-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.bubble-time {
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+.bubble-content p {
+  margin-bottom: 6px;
+}
+
+.bubble-content p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--slate-200);
+}
+
+.bubble-source-pill {
+  font-size: 10px;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #e2e8f0;
+}
+
+.bubble-conf-pill {
+  font-size: 10px;
+  font-weight: 700;
+  background: #ecfdf5;
+  color: #065f46;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #a7f3d0;
+}
+
+.bubble-hitl-tag {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #854d0e;
+  background: #fef9c3;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.chat-input {
+  flex-grow: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--slate-300);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(92, 17, 30, 0.15);
+}
+
+.chat-send-btn {
+  background: var(--brand-primary);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12.5px;
+  transition: background 0.15s ease;
+}
+
+.chat-send-btn:hover {
+  background: var(--brand-primary-dark);
+}
+
+.typing-indicator {
+  font-style: italic;
+  color: var(--slate-500);
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

@@ -50,6 +50,7 @@
       <button class="nav-tab-item" data-tab="tab-evidencias">Registro de Documentos y Evidencias</button>
       <button class="nav-tab-item" data-tab="tab-contrato">Contrato de Integración JSON (n8n)</button>
       <button class="nav-tab-item" data-tab="tab-verificacion">Auditoría de Control Específico</button>
+      <button class="nav-tab-item" data-tab="tab-asistente">🤖 Asistente Virtual (Chat IA Local)</button>
     </nav>
 
     <!-- PESTAÑA 1: EVALUACIÓN PRINCIPAL / GENERACIÓN DE LA SoA -->
@@ -353,6 +354,77 @@
 
           <div class="form-buttons">
             <button class="btn-primary" id="btn-auditar-individual">Auditar Control Seleccionado</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 5: ASISTENTE VIRTUAL (CHAT IA LOCAL RAG) -->
+    <section id="tab-asistente" class="tab-pane">
+      <div class="panel">
+        <div class="panel-header header-with-action">
+          <div>
+            <h3>Asistente Virtual de Privacidad - ISO/IEC 27701 (Motor RAG Local)</h3>
+            <p class="section-help" style="margin-top: 4px; margin-bottom: 0;">
+              Consultas en lenguaje natural procesadas mediante el modelo local <strong>paraphrase-multilingual-MiniLM-L12-v2</strong> y búsqueda vectorial <strong>FAISS</strong> sobre las directivas de la UNSA y el estándar ISO 27701:2025.
+            </p>
+          </div>
+          <div class="meta-pill-box" style="background: rgba(92,17,30,0.08); border-color: rgba(92,17,30,0.2);">
+            <span class="meta-sub" style="color: var(--brand-primary);">MOTOR IA ACTIVO</span>
+            <span class="meta-main" style="color: var(--slate-800); font-size: 11px;">MiniLM-L12 · FAISS Local</span>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <!-- Sugerencias rápidas de preguntas -->
+          <div class="chat-suggestions-box">
+            <span class="suggestions-label">Consultas frecuentes de auditoría:</span>
+            <div class="suggestions-chips">
+              <button class="chip-btn" data-query="¿Qué controles aplican a la UNSA cuando actúa como responsable del tratamiento?">
+                📋 ¿Qué controles aplican como responsable?
+              </button>
+              <button class="chip-btn" data-query="¿Qué es una evaluación de impacto de privacidad (DPIA) y cuándo es obligatoria según el control A.1.2.6?">
+                ⚠️ ¿Qué es y cuándo aplica el DPIA (A.1.2.6)?
+              </button>
+              <button class="chip-btn" data-query="¿Cuáles son los canales oficiales y procedimientos para ejercer Derechos ARCO en la UNSA?">
+                ⚖️ ¿Cómo se ejercen los Derechos ARCO (A.1.3.7)?
+              </button>
+              <button class="chip-btn" data-query="¿Qué exige la norma ISO 27701 para los contratos con encargados y proveedores externos?">
+                🤝 ¿Qué exige la norma para terceros y DPA (A.1.2.7)?
+              </button>
+              <button class="chip-btn" data-query="¿Qué requisitos de privacidad aplican al Comedor Universitario y al uso de huellas dactilares?">
+                🍱 ¿Qué requisitos aplican al Comedor Universitario?
+              </button>
+            </div>
+          </div>
+
+          <!-- Ventana de conversación del chat -->
+          <div class="chat-viewport" id="chat-viewport">
+            <div class="chat-bubble-row bot">
+              <div class="chat-avatar bot-avatar">🤖</div>
+              <div class="chat-bubble bot-bubble">
+                <div class="bubble-header">
+                  <strong>Asistente PIMS - Agente de Controles UNSA</strong>
+                  <span class="bubble-time">En línea (Local)</span>
+                </div>
+                <div class="bubble-content">
+                  <p>¡Saludos! Soy el <strong>Asistente Virtual de Privacidad</strong> del Sistema de Gestión PIMS bajo <strong>ISO/IEC 27701:2025</strong> para la Universidad Nacional de San Agustín de Arequipa.</p>
+                  <p>Puedo responder tus consultas sobre aplicabilidad de controles, directivas institucionales agustinas (DIR-OTIC-004-UNSA), procedimientos ARCO, evaluaciones de impacto (DPIA) y sustento probatorio.</p>
+                  <p style="margin-top: 6px; font-size: 11.5px; color: var(--slate-500);">
+                    <em>Nota de auditoría: Mis respuestas son sintetizadas localmente mediante recuperación semántica vectorial FAISS sin enviar datos a la nube.</em>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- Mensajes dinámicos aquí -->
+          </div>
+
+          <!-- Barra de entrada de texto -->
+          <div class="chat-input-bar">
+            <input type="text" id="txt-chat-pregunta" class="chat-input" placeholder="Escriba su consulta normativa o sobre privacidad en la UNSA (ej. ¿Qué controles aplican a SISUNSA?)..." autocomplete="off">
+            <button class="btn-primary chat-send-btn" id="btn-enviar-chat">
+              Enviar a la IA
+            </button>
           </div>
         </div>
       </div>
