@@ -1,6 +1,6 @@
 // Sistema de Auditoría PIMS - ISO/IEC 27701:2025
 // Universidad Nacional de San Agustín de Arequipa (UNSA)
-// Motor de Frontend y Gestión de Usabilidad
+// Motor de Frontend, Usabilidad Didáctica y Gestión de Controles
 
 const API_BASE = (window.location.protocol === "file:" || !window.location.port)
   ? "http://127.0.0.1:5000"
@@ -113,6 +113,7 @@ let servidorOnline = false;
 
 // Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", async () => {
+  initContextoToggle();
   initNavegacionPestanas();
   initSelectorRoles();
   initModalGuia();
@@ -131,7 +132,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btn-imprimir-reporte").addEventListener("click", () => window.print());
 });
 
-// 1. Verificación de Conectividad con el Backend Flask
+// 1. Alternar visualización del bloque explicativo de contexto
+function initContextoToggle() {
+  const btnToggle = document.getElementById("btn-toggle-contexto");
+  const bodyContent = document.getElementById("context-body-content");
+
+  if (btnToggle && bodyContent) {
+    btnToggle.addEventListener("click", () => {
+      const oculto = bodyContent.style.display === "none";
+      bodyContent.style.display = oculto ? "grid" : "none";
+      btnToggle.textContent = oculto ? "Ocultar explicación" : "Mostrar explicación";
+    });
+  }
+}
+
+// 2. Verificación de Conectividad con el Backend Flask
 async function verificarConexionServidor() {
   const statusDot = document.getElementById("status-dot");
   const statusText = document.getElementById("status-text");
@@ -143,7 +158,7 @@ async function verificarConexionServidor() {
       servidorOnline = true;
       catalogoActual = await res.json();
       statusDot.className = "status-dot online";
-      statusText.textContent = "Agente Conectado (:5000)";
+      statusText.textContent = "Servidor conectado (:5000)";
       serverAlert.style.display = "none";
       return;
     }
@@ -153,11 +168,11 @@ async function verificarConexionServidor() {
 
   servidorOnline = false;
   statusDot.className = "status-dot offline";
-  statusText.textContent = "Modo Local Autónomo";
+  statusText.textContent = "Modo local autónomo";
   serverAlert.style.display = "block";
 }
 
-// 2. Navegación entre Pestañas
+// 3. Navegación entre Pestañas
 function initNavegacionPestanas() {
   const tabs = document.querySelectorAll(".nav-tab-item");
   tabs.forEach(tab => {
@@ -171,7 +186,7 @@ function initNavegacionPestanas() {
   });
 }
 
-// 3. Selector de Roles (Tarjetas Interactivas)
+// 4. Selector de Roles (Tarjetas Seleccionables)
 function initSelectorRoles() {
   const radios = document.querySelectorAll("input[name='rol-eval']");
   radios.forEach(r => {
@@ -188,7 +203,7 @@ function obtenerRolSeleccionado() {
   return checked ? checked.value : "responsable";
 }
 
-// 4. Modal de Guía Rápida de Usabilidad
+// 5. Modal de Guía Paso a Paso
 function initModalGuia() {
   const btnAbrir = document.getElementById("btn-abrir-guia");
   const btnCerrar = document.getElementById("btn-cerrar-guia");
@@ -213,7 +228,7 @@ function initModalGuia() {
   }
 }
 
-// 5. Renderizado de Riesgos
+// 6. Renderizado de Riesgos
 function renderRiesgosResumen() {
   const box = document.getElementById("contenedor-riesgos-resumen");
   if (!box) return;
@@ -229,20 +244,20 @@ function renderRiesgosResumen() {
   });
 }
 
-// 6. Lista de Artefactos Probatorios
+// 7. Lista de Documentos Probatorios
 function renderTablaEvidencias() {
   const container = document.getElementById("contenedor-artefactos");
   const totalLbl = document.getElementById("lbl-total-evidencias");
   if (!container) return;
 
   if (totalLbl) {
-    totalLbl.textContent = `${evidenciasDocumentadas.length} documentos registrados`;
+    totalLbl.textContent = `${evidenciasDocumentadas.length} documentos disponibles`;
   }
 
   container.innerHTML = "";
 
   if (evidenciasDocumentadas.length === 0) {
-    container.innerHTML = `<div class="empty-artifacts">No hay artefactos probatorios registrados para este ciclo de auditoría.</div>`;
+    container.innerHTML = `<div class="empty-artifacts">No hay documentos de sustento registrados para esta evaluación.</div>`;
     return;
   }
 
@@ -251,7 +266,7 @@ function renderTablaEvidencias() {
     card.className = "artifact-card";
     
     const extension = e.archivo.split(".").pop().toUpperCase();
-    const textoEstado = e.estado === "implementado" ? "Oficial Vigente" : "Borrador";
+    const textoEstado = e.estado === "implementado" ? "Oficial vigente" : "Borrador";
 
     card.innerHTML = `
       <div class="artifact-header-row">
@@ -262,7 +277,7 @@ function renderTablaEvidencias() {
         </div>
         <div class="artifact-actions-group">
           <span class="artifact-status-pill">${textoEstado}</span>
-          <button class="btn-del-artifact" data-index="${idx}" title="Eliminar este documento">Eliminar</button>
+          <button class="btn-del-artifact" data-index="${idx}" title="Eliminar este archivo">Eliminar</button>
         </div>
       </div>
       <div class="artifact-description-text">${e.descripcion}</div>
@@ -278,7 +293,7 @@ function renderTablaEvidencias() {
   });
 }
 
-// 7. Formulario para Agregar Evidencias
+// 8. Formulario para Agregar Documentos de Respaldo
 function initFormularioNuevaEvidencia() {
   const btnAbrir = document.getElementById("btn-abrir-modal-evidencia");
   const subform = document.getElementById("form-registro-rapido");
@@ -301,7 +316,7 @@ function initFormularioNuevaEvidencia() {
     const est = document.getElementById("sel-nuevo-estado").value;
 
     if (!arch || !desc) {
-      alert("Por favor ingrese el nombre del archivo y una breve descripción del documento probatorio.");
+      alert("Por favor completa el nombre del archivo y una breve descripción de lo que acredita.");
       return;
     }
 
@@ -340,11 +355,11 @@ function poblarSelectsControles() {
   });
 }
 
-// 8. Ejecutar Evaluación de la SoA
+// 9. Ejecutar Evaluación de la SoA
 async function ejecutarSoA() {
   const btn = document.getElementById("btn-generar-soa");
   const originalText = btn.innerHTML;
-  btn.innerHTML = "<span>⏳ Procesando Evaluación...</span>";
+  btn.innerHTML = "<span>Procesando evaluación...</span>";
   btn.disabled = true;
 
   const org = document.getElementById("input-org").value.trim() || "Universidad Nacional de San Agustín (UNSA)";
@@ -369,11 +384,10 @@ async function ejecutarSoA() {
   }
 }
 
-// 9. Procesamiento con Fallback Determinista Inteligente
+// 10. Procesamiento con Fallback Determinista Inteligente
 async function procesarPayload(payload) {
   let resultado = null;
 
-  // Intento 1: Llamada al backend Flask
   try {
     const resp = await fetch(`${API_BASE}/api/controles/ejecutar`, {
       method: "POST",
@@ -385,10 +399,9 @@ async function procesarPayload(payload) {
       resultado = await resp.json();
     }
   } catch (err) {
-    // Si falla la red, usamos el motor determinista local
+    // Si falla la red, usamos el motor local
   }
 
-  // Intento 2 (Fallback): Motor determinista local equivalente
   if (!resultado) {
     resultado = ejecutarMotorLocal(payload);
   }
@@ -443,7 +456,7 @@ function ejecutarMotorLocal(entrada) {
   };
 
   const org = perfil.organizacion || "Universidad Nacional de San Agustín (UNSA)";
-  const texto = `SoA generada para ${org} (rol: ${rol}). Controles evaluados: ${resumen.controles_evaluados}; aplican: ${resumen.aplican}; implementados: ${resumen.implementados}; brechas: ${brechas.length}. Requiere revisión formal.`;
+  const texto = `SoA generada para ${org} (rol: ${rol}). Controles evaluados: ${resumen.controles_evaluados}; aplican: ${resumen.aplican}; implementados: ${resumen.implementados}; brechas pendientes: ${brechas.length}.`;
 
   return {
     agente: "controles",
@@ -464,22 +477,22 @@ function evaluarFilaControl(control, rol, riesgos, evidencias) {
   const ambito = control.id.slice(0, 3);
   if (ambito === "A.3") {
     aplica = true;
-    justificacion = "Control común de seguridad: aplica a cualquier rol institucional.";
+    justificacion = "Control común de seguridad: aplica obligatoriamente a cualquier institución.";
   } else if (ambito === "A.1") {
     if (rol === "responsable" || rol === "ambos") {
       aplica = true;
-      justificacion = "La UNSA actúa como responsable del tratamiento (PII Controller).";
+      justificacion = "La UNSA actúa como responsable que fija los fines y medios del tratamiento.";
     } else {
       aplica = false;
-      justificacion = "Excluido: la entidad no actúa como responsable directa para este alcance.";
+      justificacion = "No aplica: la universidad no actúa como responsable directa para este alcance.";
     }
   } else if (ambito === "A.2") {
     if (rol === "encargado" || rol === "ambos") {
       aplica = true;
-      justificacion = "La entidad actúa como encargada del tratamiento por cuenta de terceros.";
+      justificacion = "La entidad actúa como encargada de procesar datos por cuenta de un tercero.";
     } else {
       aplica = false;
-      justificacion = "Excluido: la UNSA no actúa como encargada (controles del grupo A.2).";
+      justificacion = "No aplica: la UNSA no actúa como procesadora de terceros para este ámbito.";
     }
   }
 
@@ -517,13 +530,13 @@ function evaluarFilaControl(control, rol, riesgos, evidencias) {
 }
 
 function recomendarAccion(fila) {
-  if (!fila.aplica) return "Documentar el motivo formal de exclusión en la SoA.";
-  if (fila.estado === "implementado") return "Mantener la evidencia vigente y archivarla para la auditoría interna (Cláusula 9.2).";
+  if (!fila.aplica) return "Documentar el motivo formal de exclusión en la Declaración de Aplicabilidad.";
+  if (fila.estado === "implementado") return "Mantener vigente el documento probatorio para la auditoría interna.";
   if (fila.estado === "parcial") return `Completar los requisitos pendientes y coordinar con el ${fila.responsable}.`;
-  return `Solicitar formalmente la evidencia documental al ${fila.responsable}.`;
+  return `Solicitar formalmente el documento de sustento al ${fila.responsable}.`;
 }
 
-// 10. Renderizar Resultados en Pantalla
+// 11. Renderizar Resultados en Pantalla
 function renderizarResultadosSoA(res) {
   const panel = document.getElementById("panel-resultados-soa");
   panel.style.display = "block";
@@ -554,7 +567,7 @@ function renderizarResultadosSoA(res) {
 
     const lblPct = document.getElementById("lbl-compliance-pct");
     if (lblPct) {
-      lblPct.textContent = `${pctImp}% Conforme (${r.implementados}/${r.aplican} aplicables)`;
+      lblPct.textContent = `${pctImp}% Cumplido (${r.implementados} de ${r.aplican} aplicables)`;
     }
 
     const barImp = document.getElementById("bar-imp");
@@ -571,7 +584,7 @@ function renderizarResultadosSoA(res) {
   initFiltrosSoA(filas);
 }
 
-// 11. Buscador en Vivo de la SoA
+// 12. Buscador en Vivo de la SoA
 function initBuscadorSoA() {
   const searchInput = document.getElementById("input-buscar-soa");
   if (!searchInput) return;
@@ -589,7 +602,6 @@ function renderFilasSoA(filas) {
   tbody.innerHTML = "";
 
   const filtradas = filas.filter(f => {
-    // 1. Filtro por píldoras
     let pasaPildora = true;
     if (filtroTablaSoA === "brechas") pasaPildora = (f.aplica && f.estado === "no implementado");
     else if (filtroTablaSoA === "implementados") pasaPildora = (f.estado === "implementado");
@@ -597,7 +609,6 @@ function renderFilasSoA(filas) {
 
     if (!pasaPildora) return false;
 
-    // 2. Filtro por buscador en vivo
     if (busquedaFiltroSoA) {
       const textoCompleto = `${f.control} ${f.nombre} ${f.justificacion} ${f.responsable} ${f.estado}`.toLowerCase();
       if (!textoCompleto.includes(busquedaFiltroSoA)) return false;
@@ -608,7 +619,7 @@ function renderFilasSoA(filas) {
 
   if (filtradas.length === 0) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="8" style="text-align:center; padding:24px; color:var(--slate-400);">No se encontraron controles que coincidan con el filtro actual.</td>`;
+    tr.innerHTML = `<td colspan="8" style="text-align:center; padding:20px; color:var(--slate-400);">No se encontraron controles que coincidan con la búsqueda.</td>`;
     tbody.appendChild(tr);
     return;
   }
@@ -616,17 +627,17 @@ function renderFilasSoA(filas) {
   filtradas.forEach(f => {
     const tr = document.createElement("tr");
 
-    let textoEstadoFormal = "Excluido (No Aplica)";
+    let textoEstadoFormal = "No aplica al rol";
     let statusClass = "audit-tag-excluido";
 
     if (f.estado === "implementado") {
-      textoEstadoFormal = "Conforme (Implementado)";
+      textoEstadoFormal = "Cumplido (Oficial)";
       statusClass = "audit-tag-conforme";
     } else if (f.estado === "parcial") {
-      textoEstadoFormal = "En Proceso (Parcial)";
+      textoEstadoFormal = "En trámite (Parcial)";
       statusClass = "audit-tag-proceso";
     } else if (f.estado === "no implementado") {
-      textoEstadoFormal = "Pendiente (Brecha)";
+      textoEstadoFormal = "Brecha pendiente";
       statusClass = "audit-tag-pendiente";
     }
 
@@ -643,7 +654,7 @@ function renderFilasSoA(filas) {
     tr.innerHTML = `
       <td><span class="control-code">${f.control}</span></td>
       <td><strong>${f.nombre}</strong></td>
-      <td style="text-align:center;">${f.aplica ? '<span style="color:var(--emerald-600); font-weight:700;">Sí</span>' : '<span style="color:var(--slate-400);">No</span>'}</td>
+      <td style="text-align:center;">${f.aplica ? '<span style="color:#166534; font-weight:700;">Sí</span>' : '<span style="color:var(--slate-400);">No</span>'}</td>
       <td style="color:var(--slate-700); line-height:1.4;">${f.justificacion}</td>
       <td><span class="audit-status-label ${statusClass}">${textoEstadoFormal}</span></td>
       <td>${textoEvidencias}</td>
@@ -660,7 +671,7 @@ function renderItemsBrechas(brechas) {
   container.innerHTML = "";
 
   if (!brechas || brechas.length === 0) {
-    container.innerHTML = "<p style='color:var(--emerald-600); font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
+    container.innerHTML = "<p style='color:#166534; font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
     return;
   }
 
@@ -669,8 +680,8 @@ function renderItemsBrechas(brechas) {
     card.className = "gap-card";
     card.innerHTML = `
       <strong>${b.control}: ${b.nombre}</strong>
-      <div>Estado actual: <em>${b.estado}</em></div>
-      <div class="assigned">Solicitar subsanación a: <span>${b.solicitar_a}</span></div>
+      <div>Estado actual: <em>${b.estado === "no implementado" ? "Sin documento de respaldo" : b.estado}</em></div>
+      <div class="assigned">Área a cargo de resolverlo: <span>${b.solicitar_a}</span></div>
     `;
     container.appendChild(card);
   });
@@ -688,7 +699,7 @@ function initFiltrosSoA(filas) {
   });
 }
 
-// 12. Presets JSON y Copiado al Portapapeles
+// 13. Presets JSON y Copiado al Portapapeles
 function initPresetsJSON() {
   const select = document.getElementById("sel-preset-json");
   const txt = document.getElementById("txt-json-payload");
@@ -743,12 +754,12 @@ function initPresetsJSON() {
       try {
         await navigator.clipboard.writeText(txt.value);
         const originalText = btnCopiar.innerHTML;
-        btnCopiar.innerHTML = `<span>✓ ¡Copiado al portapapeles!</span>`;
+        btnCopiar.innerHTML = `<span>Copiado al portapapeles</span>`;
         setTimeout(() => {
           btnCopiar.innerHTML = originalText;
         }, 2000);
       } catch (err) {
-        alert("No se pudo copiar automáticamente. Por favor seleccione el texto manualmente.");
+        alert("No se pudo copiar automáticamente. Por favor selecciona el texto manualmente.");
       }
     });
   }
