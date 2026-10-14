@@ -40,20 +40,35 @@ class Indice:
 
 
 def desde_carpeta(carpeta):
-    """Lee los .md de una carpeta y los parte por párrafos extrayendo su identificador."""
+    """Lee los .md de una carpeta, une encabezados con sus párrafos y extrae metadatos limpios."""
     textos, metas = [], []
     for ruta in sorted(glob.glob(os.path.join(carpeta, "*.md"))):
         with open(ruta, encoding="utf-8") as f:
-            for parte in f.read().split("\n\n"):
-                p = parte.strip()
-                if p:
-                    textos.append(p)
-                    primera_linea = p.split("\n")[0].replace("#", "").strip()
-                    if ":" in primera_linea and len(primera_linea.split(":")[0]) < 140:
-                        meta_label = primera_linea.split(":")[0].strip()
-                    elif len(primera_linea) < 140:
-                        meta_label = primera_linea
-                    else:
-                        meta_label = os.path.basename(ruta)
+            contenido = f.read()
+
+        partes = [p.strip() for p in contenido.split("\n\n") if p.strip()]
+        i = 0
+        while i < len(partes):
+            p = partes[i]
+            # Si el bloque es muy corto (< 100 caracteres) y parece un encabezado
+            if len(p) < 100 and (p.startswith("#") or ":" in p or p.startswith("ISO/IEC") or p.startswith("Normativa")):
+                if i + 1 < len(partes):
+                    titulo = p.replace("#", "").strip()
+                    cuerpo = partes[i + 1]
+                    texto_completo = f"{titulo}\n\n{cuerpo}"
+                    meta_label = titulo.split("\n")[0].strip().rstrip(":")
+                    textos.append(texto_completo)
                     metas.append(meta_label)
+                    i += 2
+                    continue
+
+            # Bloque con contenido completo
+            if len(p) >= 80:
+                lineas = [l for l in p.split("\n") if l.strip()]
+                primera = lineas[0].replace("#", "").strip()
+                meta_label = primera.split(":")[0].strip() if ":" in primera else primera[:90]
+                textos.append(p)
+                metas.append(meta_label)
+            i += 1
+
     return Indice(textos, metas)

@@ -168,22 +168,47 @@ class AgenteControles:
         return f"Solicitar evidencia o implementación al {fila['responsable']}."
 
     # ------------------------------------------------------------------
-    # Consulta conceptual (base de conocimiento)
+    # Consulta conceptual (base de conocimiento RAG)
     # ------------------------------------------------------------------
     def _consultar(self, solicitud):
         if not solicitud.strip():
-            return self._resp("consultar", "rechazada", "La consulta está vacía.")
-        hits = self.normativa.buscar(solicitud, k=3)
-        if not hits or hits[0]["score"] < UMBRAL_CONSULTA:
+            return self._resp("consultar", "rechazada", "La consulta está vacía.", datos={"hits": []})
+        hits_norm = self.normativa.buscar(solicitud, k=4)
+        hits_pol = self.politicas.buscar(solicitud, k=4)
+        todos_hits = sorted(hits_norm + hits_pol, key=lambda x: x["score"], reverse=True)[:5]
+        hits_validos = [h for h in todos_hits if h["score"] >= 0.15]
+        if not hits_validos:
             return self._resp(
                 "consultar", "sin_respuesta",
-                "No tengo información suficiente en mi base de conocimiento para responder.",
-                confianza=hits[0]["score"] if hits else 0.0,
+                "No se encontraron directivas o cláusulas con suficiente afinidad en el repositorio institucional.",
+                confianza=round(todos_hits[0]["score"], 3) if todos_hits else 0.0,
+                datos={"respuesta_directa": "No se encontraron directivas o cláusulas con suficiente afinidad.", "hits": []}
             )
+
+        # 1. Intentar generar respuesta elaborada en lenguaje natural con Ollama si está disponible
+        respuesta_sintetizada = None
+        try:
+            import ollama_client
+            if ollama_client.esta_disponible():
+                respuesta_sintetizada = ollama_client.enriquecer_consulta_rag(solicitud, hits_validos[:3])
+        except Exception:
+            pass
+
+        # 2. Si Ollama no está activo o falló, construir una respuesta directa limpia y comprensible
+        if not respuesta_sintetizada:
+            top = hits_validos[0]
+            lineas = [l.strip() for l in top["texto"].split("\n") if l.strip()]
+            cuerpo = "\n\n".join(lineas[1:]) if len(lineas) > 1 else lineas[0]
+            respuesta_sintetizada = (
+                f"De acuerdo con **{top['meta']}** (normativa con mayor afinidad: {round(top['score']*100, 1)}%):\n\n"
+                f"{cuerpo}"
+            )
+
         return self._resp(
-            "consultar", "ok", "\n\n".join(h["texto"] for h in hits),
-            fuentes=sorted({h["meta"] for h in hits}),
-            confianza=round(hits[0]["score"], 3),
+            "consultar", "ok", respuesta_sintetizada,
+            fuentes=sorted(list({h["meta"] for h in hits_validos})),
+            confianza=round(hits_validos[0]["score"], 3),
+            datos={"respuesta_directa": respuesta_sintetizada, "hits": hits_validos}
         )
 
     # ------------------------------------------------------------------

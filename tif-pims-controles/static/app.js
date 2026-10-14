@@ -1,5 +1,6 @@
-// Sistema de Auditoría PIMS - ISO/IEC 27701:2025
+// Sistema de Auditoría de Privacidad PIMS (ISO/IEC 27701:2025)
 // Universidad Nacional de San Agustín de Arequipa (UNSA)
+// Diseño Minimalista Ejecutivo en Tonos Plomo / Slate
 
 const API_BASE = (window.location.protocol === "file:" || !window.location.port)
   ? "http://127.0.0.1:5000"
@@ -19,88 +20,120 @@ const CATALOGO_BASE = [
   {"id": "A.3.17", "nombre": "Concienciación y formación", "agente_responsable": "Agente de Formación"}
 ];
 
-// Mapeo semántico oficial de la Política de Privacidad de la UNSA (politica_privacidad_unsa.md)
+// Mapeo semántico a la directiva institucional de la UNSA
 const POLITICAS_MAP = {
-  "A.1.2.2": "Política UNSA - Finalidad de Datos de Estudiantes y Comedor Universitario",
-  "A.1.2.9": "Política UNSA - Bancos de Datos Personales Registrados (RAT Institucional)",
-  "A.1.2.6": "Política UNSA - Evaluación de Impacto (DPIA) y Acceso a Comedor Universitario",
-  "A.1.2.7": "Política UNSA - Gestión de Terceros, Proveedores y Transferencias",
-  "A.1.3.7": "Política UNSA - Ejercicio de Derechos ARCO (Mesa de Partes y odp@unsa.edu.pe)",
-  "A.1.3.9": "Política UNSA - Ejercicio de Derechos ARCO (Mesa de Partes y odp@unsa.edu.pe)",
-  "A.2.5.7": "Política UNSA - Gestión de Terceros, Proveedores y Transferencias",
-  "A.3.11": "Política UNSA - Seguridad de la Información, Vigilancia y Control de Incidentes",
-  "A.3.12": "Política UNSA - Seguridad de la Información, Vigilancia y Control de Incidentes",
-  "A.3.17": "Política UNSA - Datos de Docentes, Personal y Aula Virtual"
+  "A.1.2.2": "DIR-OTIC-004-UNSA: Finalidad de Datos de Estudiantes y Comedor Universitario",
+  "A.1.2.9": "DIR-OTIC-004-UNSA: Bancos de Datos Registrados (RAT Institucional)",
+  "A.1.2.6": "DIR-OTIC-004-UNSA: Evaluación de Impacto (DPIA) en Comedor Universitario",
+  "A.1.2.7": "DIR-OTIC-004-UNSA: Gestión de Terceros, Proveedores y Transferencias",
+  "A.1.3.7": "DIR-OTIC-004-UNSA: Procedimiento Derechos ARCO (odp@unsa.edu.pe)",
+  "A.1.3.9": "DIR-OTIC-004-UNSA: Expedición de Copias de Datos Personales",
+  "A.2.5.7": "DIR-OTIC-004-UNSA: Supervisión de Subcontratistas y Encargados",
+  "A.3.11": "DIR-OTIC-004-UNSA: Planificación y Vigilancia de Incidentes de Seguridad",
+  "A.3.12": "DIR-OTIC-004-UNSA: Protocolo de Respuesta ante Brechas (CSIRT-UNSA)",
+  "A.3.17": "DIR-OTIC-004-UNSA: Formación Continua de Docentes y Administrativos"
 };
 
-// Evidencias Documentales Oficiales de la UNSA (Archivos Reales en knowledge/evidencias/)
+// Evidencias Documentales de la UNSA
 let evidenciasDocumentadas = [
   {
     control: "A.1.2.2",
-    archivo: "reglamento_matricula_2020_modi.pdf",
-    descripcion: "Reglamento General de Matrícula (RCU N° 0127-2020): Fines académicos legítimos, deberes de estudiantes y registro en SISUNSA",
+    archivo: "RCU-0127-2020-Reglamento-Matricula.pdf",
+    descripcion: "Fines académicos legítimos, deberes de estudiantes y registro oficial en SISUNSA",
     estado: "implementado"
   },
   {
     control: "A.1.2.2",
-    archivo: "Declaracion-Jurada-Admision-Mayor-Edad.pdf",
-    descripcion: "SISADMISION: Cláusula de consentimiento informado previo y tratamiento biométrico de postulantes (DUA-UNSA)",
+    archivo: "DJ-Consentimiento-Admision.pdf",
+    descripcion: "Cláusula de consentimiento previo informado y tratamiento biométrico de postulantes",
     estado: "implementado"
   },
   {
     control: "A.1.2.9",
-    archivo: "Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf",
-    descripcion: "Resoluciones de Consejo Universitario (RCU 0127-2020, RCU 0009-2026): Registro oficial RAT de bancos de datos SISUNSA y Campus Virtual",
+    archivo: "RCU-0009-2026-Registro-RAT.pdf",
+    descripcion: "Registro de Actividades de Tratamiento (RAT) para bancos de datos SISUNSA y Campus Virtual",
     estado: "implementado"
   },
   {
     control: "A.1.2.6",
-    archivo: "RCU-0127-2025-Reglamento-Comedor-Universitario.pdf",
-    descripcion: "Reglamento de Comedor Universitario (RCU N° 0127-2025 - DUDE): DPIA para validación socioeconómica y huellas dactilares de comensales",
+    archivo: "Borrador-DPIA-Comedor-2025.docx",
+    descripcion: "Evaluación preliminar de impacto para validación socioeconómica y huellas dactilares",
     estado: "parcial"
   },
   {
     control: "A.1.3.7",
-    archivo: "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
-    descripcion: "TUPA Institucional: Procedimiento oficial de Derechos ARCO ante Secretaría General (San Agustín 115) y odp@unsa.edu.pe",
+    archivo: "TUPA-Procedimiento-ARCO-UNSA.pdf",
+    descripcion: "Procedimiento oficial de Derechos ARCO ante Secretaría General y odp@unsa.edu.pe",
     estado: "implementado"
   },
   {
     control: "A.1.3.9",
-    archivo: "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
-    descripcion: "TUPA Institucional: Expedición de constancias y copia legible de PII para estudiantes y egresados agustinos",
+    archivo: "TUPA-Procedimiento-ARCO-UNSA.pdf",
+    descripcion: "Expedición de constancias y copia íntegra de datos personales para estudiantes agustinos",
     estado: "implementado"
   },
   {
     control: "A.1.2.7",
-    archivo: "Contrato-DPA-Google-Workspace-UNSA.pdf",
-    descripcion: "Acuerdo de Protección de Datos (DPA) para servicio de correo @unsa.edu.pe y almacenamiento educativo",
+    archivo: "Contrato-DPA-Google-Workspace.pdf",
+    descripcion: "Acuerdo de Procesamiento de Datos (DPA) para cuentas institucionales @unsa.edu.pe",
     estado: "implementado"
   },
   {
     control: "A.3.12",
-    archivo: "Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx",
-    descripcion: "Borrador de protocolo de contención y contingencia ante brechas en banco de datos Seguridad y Vigilancia (OTI-UNSA)",
+    archivo: "Protocolo-CSIRT-UNSA-v0.2.docx",
+    descripcion: "Borrador del plan de contención ante incidentes de seguridad y notificación a la ANPD",
     estado: "parcial"
   }
 ];
 
-// Riesgos registrados de la UNSA
+// Riesgos mapeados en la UNSA
 const riesgosUNSA = [
   {
     id: "R-UNSA-01",
     descripcion: "Riesgo de acceso no autorizado o filtración de notas y DNI en SISUNSA",
-    controles: ["A.1.2.6", "A.3.12"]
+    controles: ["A.1.2.6", "A.3.12"],
+    impacto: "Alto"
   },
   {
     id: "R-UNSA-02",
-    descripcion: "Tratamiento de huellas dactilares en Comedor Universitario sin DPIA completo",
-    controles: ["A.1.2.6"]
+    descripcion: "Tratamiento de huellas dactilares en Comedor Universitario sin DPIA integral",
+    controles: ["A.1.2.6"],
+    impacto: "Crítico"
   },
   {
     id: "R-UNSA-03",
-    descripcion: "Demora en tramitación de solicitudes de acceso y rectificación de datos (ARCO)",
-    controles: ["A.1.3.7", "A.1.3.9"]
+    descripcion: "Retrasos en la tramitación de derechos de acceso y supresión ARCO de egresados",
+    controles: ["A.1.3.7", "A.1.3.9"],
+    impacto: "Medio"
+  }
+];
+
+// Fallback de textos normativos para búsqueda RAG offline
+const KNOWLEDGE_FALLBACK = [
+  {
+    meta: "DIR-OTIC-004-UNSA · Art. 7 (Comedor Universitario)",
+    texto: "El tratamiento de huellas dactilares y datos biométricos de los comensales del Comedor Universitario requiere una Evaluación de Impacto en la Protección de Datos Personales (DPIA). Los datos biométricos se conservan únicamente durante la condición de comensal activo.",
+    keywords: ["comedor", "biometria", "huellas", "dactilares", "comensales", "dpia"]
+  },
+  {
+    meta: "DIR-OTIC-004-UNSA · Art. 4 (Consentimiento y SISUNSA)",
+    texto: "En los sistemas de matrícula académica (SISUNSA) y admisión (SISADMISION), el consentimiento debe ser libre, previo, expreso e inequívoco. La universidad publicará las cláusulas informativas de privacidad antes del envío del formulario.",
+    keywords: ["consentimiento", "sisunsa", "admision", "estudiantes", "postulantes", "matricula"]
+  },
+  {
+    meta: "DIR-OTIC-004-UNSA · Art. 12 (Derechos ARCO)",
+    texto: "Los titulares de datos personales pueden ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) mediante solicitud formal ante Mesa de Partes (Calle San Agustín 115) o enviando un correo al Oficial de Datos: odp@unsa.edu.pe. Plazo de atención: 10 días hábiles.",
+    keywords: ["arco", "derechos", "acceso", "rectificacion", "cancelacion", "oposicion", "odp@unsa.edu.pe"]
+  },
+  {
+    meta: "DIR-OTIC-004-UNSA · Art. 15 (Gestión de Incidentes)",
+    texto: "Toda brecha de seguridad que afecte la confidencialidad de datos personales debe ser reportada al CSIRT-UNSA dentro de las 24 horas y notificada a la Autoridad Nacional de Protección de Datos Personales (ANPD) conforme a ley.",
+    keywords: ["incidentes", "seguridad", "brechas", "csirt", "anpd", "notificacion"]
+  },
+  {
+    meta: "ISO/IEC 27701:2025 · Control A.1.2.7 (Encargados y Terceros)",
+    texto: "La organización responsable debe suscribir acuerdos contractuales por escrito con cada encargado del tratamiento (DPA), garantizando que cumplan medidas técnicas y organizativas equivalentes a las exigidas por el marco PIMS.",
+    keywords: ["contratos", "terceros", "encargados", "proveedores", "dpa", "google", "workspace"]
   }
 ];
 
@@ -109,25 +142,25 @@ let filtroTablaSoA = "todos";
 let resultadoSoAUltimo = null;
 let servidorOnline = false;
 
-// Inicialización
+// Inicialización de la Aplicación
 document.addEventListener("DOMContentLoaded", async () => {
   initNavegacionPestanas();
   initSelectorRoles();
-  renderRiesgosResumen();
-  renderTablaEvidencias();
+  renderRiesgos();
+  renderEvidencias();
   initFormularioNuevaEvidencia();
-  initPresetsJSON();
-  await verificarConexionServidor();
+  initBuscadorRAG();
+  initBotonSiguientePaso();
   poblarSelectsControles();
+  await verificarConexionServidor();
 
   document.getElementById("btn-generar-soa").addEventListener("click", ejecutarSoA);
   document.getElementById("btn-auditar-individual").addEventListener("click", auditarControlPuntual);
-  document.getElementById("btn-enviar-json").addEventListener("click", procesarJsonDirecto);
   document.getElementById("btn-descargar-json").addEventListener("click", exportarJson);
   document.getElementById("btn-imprimir-reporte").addEventListener("click", () => window.print());
 });
 
-// 1. Verificación de Conectividad con Flask
+// 1. Verificación de Estado del Servidor
 async function verificarConexionServidor() {
   const statusDot = document.getElementById("status-dot");
   const statusText = document.getElementById("status-text");
@@ -139,12 +172,12 @@ async function verificarConexionServidor() {
       servidorOnline = true;
       catalogoActual = await res.json();
       statusDot.className = "status-dot online";
-      statusText.textContent = "Agente en Línea (API :5000)";
+      statusText.textContent = "Agente en Línea (:5000)";
       serverAlert.style.display = "none";
       return;
     }
   } catch (err) {
-    // Servidor no disponible
+    // Modo desconectado
   }
 
   servidorOnline = false;
@@ -153,17 +186,37 @@ async function verificarConexionServidor() {
   serverAlert.style.display = "block";
 }
 
-// 2. Navegación entre Pestañas
+// 2. Navegación de 3 Ventanas
 function initNavegacionPestanas() {
-  const tabs = document.querySelectorAll(".nav-tab-item");
+  const tabs = document.querySelectorAll(".tab-trigger");
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
-      tab.classList.add("active");
-      const target = document.getElementById(tab.dataset.tab);
-      if (target) target.classList.add("active");
+      activarPestana(tab.dataset.tab);
     });
+  });
+}
+
+function activarPestana(targetId) {
+  const tabs = document.querySelectorAll(".tab-trigger");
+  const views = document.querySelectorAll(".tab-view");
+
+  tabs.forEach(t => {
+    t.classList.toggle("active", t.dataset.tab === targetId);
+  });
+
+  views.forEach(v => {
+    v.classList.toggle("active", v.id === targetId);
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function initBotonSiguientePaso() {
+  const btn = document.getElementById("btn-ir-skills");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    activarPestana("tab-skills");
+    ejecutarSoA();
   });
 }
 
@@ -172,8 +225,8 @@ function initSelectorRoles() {
   const radios = document.querySelectorAll("input[name='rol-eval']");
   radios.forEach(r => {
     r.addEventListener("change", () => {
-      document.querySelectorAll(".role-opt").forEach(opt => opt.classList.remove("selected"));
-      const parent = r.closest(".role-opt");
+      document.querySelectorAll(".role-clean-option").forEach(opt => opt.classList.remove("selected"));
+      const parent = r.closest(".role-clean-option");
       if (parent) parent.classList.add("selected");
     });
   });
@@ -185,63 +238,66 @@ function obtenerRolSeleccionado() {
 }
 
 // 4. Renderizado de Riesgos
-function renderRiesgosResumen() {
-  const box = document.getElementById("contenedor-riesgos-resumen");
-  if (!box) return;
-  box.innerHTML = "";
+function renderRiesgos() {
+  const container = document.getElementById("contenedor-riesgos-resumen");
+  if (!container) return;
+  container.innerHTML = "";
+
   riesgosUNSA.forEach(r => {
     const item = document.createElement("div");
-    item.className = "risk-summary-item";
-    item.innerHTML = `<strong>${r.id}:</strong> ${r.descripcion} <br/><span class="agent-tag">Controles requeridos: ${r.controles.join(", ")}</span>`;
-    box.appendChild(item);
+    item.className = "risk-item-row";
+    item.innerHTML = `
+      <div class="risk-item-top">
+        <span class="risk-code">${r.id}</span>
+        <span class="risk-impact-tag">Impacto: ${r.impacto}</span>
+      </div>
+      <div class="risk-item-desc">${r.descripcion}</div>
+      <div class="risk-ctrls-link">Exige mitigar: <strong>${r.controles.join(", ")}</strong></div>
+    `;
+    container.appendChild(item);
   });
 }
 
-// 5. Lista Espaciosa de Artefactos Probatorios
-function renderTablaEvidencias() {
+// 5. Renderizado de Evidencias
+function renderEvidencias() {
   const container = document.getElementById("contenedor-artefactos");
   if (!container) return;
   container.innerHTML = "";
 
   if (evidenciasDocumentadas.length === 0) {
-    container.innerHTML = `<div class="empty-artifacts">No hay artefactos documentados registrados para este ciclo de auditoría.</div>`;
+    container.innerHTML = `<div style="font-size: 12px; color: var(--ink-subtle); padding: 12px; text-align: center;">No hay documentos registrados.</div>`;
     return;
   }
 
   evidenciasDocumentadas.forEach((e, idx) => {
-    const card = document.createElement("div");
-    card.className = "artifact-card";
-    
-    // Extensión del archivo para la etiqueta de formato
-    const extension = e.archivo.split(".").pop().toUpperCase();
-    const textoEstado = e.estado === "implementado" ? "Documento Oficial Vigente" : "Borrador en Revisión";
+    const item = document.createElement("div");
+    item.className = "evidence-clean-item";
+    const statusText = e.estado === "implementado" ? "Oficial Vigente" : "Borrador";
+    const statusClass = e.estado === "implementado" ? "imp" : "parc";
 
-    card.innerHTML = `
-      <div class="artifact-header-row">
-        <div class="artifact-title-group">
-          <span class="file-ext-tag">${extension}</span>
-          <span class="artifact-filename">${e.archivo}</span>
-          <span class="artifact-control-badge">Control ${e.control}</span>
-        </div>
-        <div class="artifact-actions-group">
-          <span class="artifact-status-pill">${textoEstado}</span>
-          <button class="btn-del-artifact" data-index="${idx}" title="Eliminar este documento de la auditoría">Eliminar</button>
+    item.innerHTML = `
+      <div class="evidence-top">
+        <span class="evidence-ctrl-badge">Control ${e.control}</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge-status-clean ${statusClass}">${statusText}</span>
+          <button class="btn-del-doc" data-index="${idx}" style="background:none; border:none; color:var(--ink-light); cursor:pointer; font-size:11px;" title="Eliminar documento">✕</button>
         </div>
       </div>
-      <div class="artifact-description-text">${e.descripcion}</div>
+      <div class="evidence-file">${e.archivo}</div>
+      <div class="evidence-desc">${e.descripcion}</div>
     `;
 
-    card.querySelector(".btn-del-artifact").addEventListener("click", (evt) => {
+    item.querySelector(".btn-del-doc").addEventListener("click", (evt) => {
       const i = parseInt(evt.target.dataset.index, 10);
       evidenciasDocumentadas.splice(i, 1);
-      renderTablaEvidencias();
+      renderEvidencias();
     });
 
-    container.appendChild(card);
+    container.appendChild(item);
   });
 }
 
-// 6. Formulario para Agregar Evidencias
+// 6. Formulario de Nueva Evidencia
 function initFormularioNuevaEvidencia() {
   const btnAbrir = document.getElementById("btn-abrir-modal-evidencia");
   const subform = document.getElementById("form-registro-rapido");
@@ -249,8 +305,7 @@ function initFormularioNuevaEvidencia() {
   const btnGuardar = document.getElementById("btn-guardar-documento");
 
   btnAbrir.addEventListener("click", () => {
-    subform.style.display = "block";
-    subform.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    subform.style.display = subform.style.display === "none" ? "block" : "none";
   });
 
   btnCancelar.addEventListener("click", () => {
@@ -264,7 +319,7 @@ function initFormularioNuevaEvidencia() {
     const est = document.getElementById("sel-nuevo-estado").value;
 
     if (!arch || !desc) {
-      alert("Por favor ingrese el nombre del archivo y una breve descripción del documento probatorio.");
+      alert("Por favor ingrese el nombre del archivo y una breve descripción.");
       return;
     }
 
@@ -278,7 +333,7 @@ function initFormularioNuevaEvidencia() {
     document.getElementById("txt-nuevo-archivo").value = "";
     document.getElementById("txt-nueva-desc").value = "";
     subform.style.display = "none";
-    renderTablaEvidencias();
+    renderEvidencias();
   });
 }
 
@@ -303,45 +358,36 @@ function poblarSelectsControles() {
   });
 }
 
-// 7. Ejecutar Evaluación de la SoA
+// 7. Skill 1: Generación de la SoA
 async function ejecutarSoA() {
-  const org = document.getElementById("input-org").value.trim() || "Universidad Nacional de San Agustín (UNSA)";
   const rol = obtenerRolSeleccionado();
 
   const payload = {
     operacion: "generar_soa",
-    perfil: { organizacion: org, rol: rol },
+    perfil: { organizacion: "Universidad Nacional de San Agustín de Arequipa (UNSA)", rol: rol },
     riesgos: riesgosUNSA,
     evidencias: evidenciasDocumentadas.map(e => ({
       control: e.control,
-      descripcion: `[Archivo: ${e.archivo}] ${e.descripcion}`,
+      descripcion: `[${e.archivo}] ${e.descripcion}`,
       estado: e.estado
     }))
   };
 
-  await procesarPayload(payload);
-}
-
-// 8. Procesamiento con Fallback Determinista Inteligente
-async function procesarPayload(payload) {
   let resultado = null;
 
-  // Intento 1: Llamada al backend Flask
   try {
     const resp = await fetch(`${API_BASE}/api/controles/ejecutar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-
     if (resp.ok) {
       resultado = await resp.json();
     }
   } catch (err) {
-    // Si falla la red, usamos el motor determinista local
+    // Fallback
   }
 
-  // Intento 2 (Fallback): Motor determinista local equivalente
   if (!resultado) {
     resultado = ejecutarMotorLocal(payload);
   }
@@ -349,7 +395,7 @@ async function procesarPayload(payload) {
   renderizarResultadosSoA(resultado);
 }
 
-// Motor Determinista de Contingencia en JavaScript (Misma lógica matemática que agentes/controles.py)
+// Motor de Contingencia determinista
 function ejecutarMotorLocal(entrada) {
   const operacion = entrada.operacion || "generar_soa";
   const perfil = entrada.perfil || {};
@@ -366,15 +412,13 @@ function ejecutarMotorLocal(entrada) {
       agente: "controles",
       operacion: "verificar_control",
       estado: "ok",
-      respuesta: `Control ${fila.control}: ${fila.estado}. Recomendación: ${fila.recomendacion}`,
+      respuesta: `Control ${fila.control}: ${fila.estado}. ${fila.recomendacion}`,
       datos: fila,
-      fuentes: ["catalogo_controles.json", "DIR-OTIC-004-UNSA.md"],
-      confianza: 1.0,
-      requiere_revision_humana: true
+      fuentes: ["catalogo_controles.json", "DIR-OTIC-004-UNSA"],
+      confianza: 1.0
     };
   }
 
-  // Generar SoA Completa
   const soa = catalogoActual.map(ctrl => evaluarFilaControl(ctrl, rol, riesgos, evidencias));
   const aplicables = soa.filter(f => f.aplica);
   const brechas = aplicables
@@ -395,18 +439,14 @@ function ejecutarMotorLocal(entrada) {
     no_implementados: aplicables.filter(f => f.estado === "no implementado").length
   };
 
-  const org = perfil.organizacion || "Universidad Nacional de San Agustín (UNSA)";
-  const texto = `SoA generada para ${org} (rol: ${rol}). Controles evaluados: ${resumen.controles_evaluados}; aplican: ${resumen.aplican}; implementados: ${resumen.implementados}; brechas: ${brechas.length}. Requiere revisión formal.`;
-
   return {
     agente: "controles",
     operacion: "generar_soa",
     estado: "ok",
-    respuesta: texto,
+    respuesta: `SoA generada para la UNSA (rol: ${rol}). Evaluados: ${resumen.controles_evaluados}; Aplican: ${resumen.aplican}; Implementados: ${resumen.implementados}; Brechas: ${brechas.length}.`,
     datos: { soa, brechas, resumen },
-    fuentes: ["catalogo_controles.json", "DIR-OTIC-004-UNSA.md"],
-    confianza: 1.0,
-    requiere_revision_humana: true
+    fuentes: ["catalogo_controles.json", "DIR-OTIC-004-UNSA"],
+    confianza: 1.0
   };
 }
 
@@ -432,17 +472,15 @@ function evaluarFilaControl(control, rol, riesgos, evidencias) {
       justificacion = "La entidad actúa como encargada del tratamiento por cuenta de terceros.";
     } else {
       aplica = false;
-      justificacion = "Excluido: la UNSA no actúa como encargada (controles del grupo A.2).";
+      justificacion = "Excluido: la UNSA no actúa como encargada (controles A.2).";
     }
   }
 
-  // Vincular Riesgos
   const vinculados = riesgos.filter(r => (r.controles || []).includes(control.id)).map(r => r.id);
   if (aplica && vinculados.length > 0) {
-    justificacion += ` Vinculado a los riesgos: ${vinculados.join(", ")}.`;
+    justificacion += ` Vinculado a: ${vinculados.join(", ")}.`;
   }
 
-  // Evaluar Evidencias
   let estado = "no aplica";
   let docs = [];
   if (aplica) {
@@ -473,20 +511,16 @@ function evaluarFilaControl(control, rol, riesgos, evidencias) {
 
 function recomendarAccion(fila) {
   if (!fila.aplica) return "Documentar el motivo formal de exclusión en la SoA.";
-  if (fila.estado === "implementado") return "Mantener la evidencia vigente y archivarla para la auditoría interna (Cláusula 9.2).";
-  if (fila.estado === "parcial") return `Completar los requisitos pendientes y solicitar actualización al ${fila.responsable}.`;
-  return `Solicitar formalmente la evidencia documental al ${fila.responsable}.`;
+  if (fila.estado === "implementado") return "Mantener la evidencia vigente y archivarla para la auditoría interna (Cl. 9.2).";
+  if (fila.estado === "parcial") return `Completar requisitos y solicitar expediente oficial al ${fila.responsable}.`;
+  return `Solicitar formalmente la documentación e implementación al ${fila.responsable}.`;
 }
 
-// 9. Renderizar Resultados en Pantalla
+// 8. Renderizado de la SoA
 function renderizarResultadosSoA(res) {
   const panel = document.getElementById("panel-resultados-soa");
   panel.style.display = "block";
-  panel.scrollIntoView({ behavior: "smooth", block: "start" });
-
   resultadoSoAUltimo = res;
-
-  document.getElementById("lbl-subtitulo-soa").textContent = res.respuesta || "";
 
   if (res.datos && res.datos.resumen) {
     const r = res.datos.resumen;
@@ -502,7 +536,6 @@ function renderizarResultadosSoA(res) {
     document.getElementById("txt-count-exc").textContent = r.excluidos;
   }
 
-  // Render Tabla y Brechas
   renderFilasSoA(res.datos ? res.datos.soa : []);
   renderItemsBrechas(res.datos ? res.datos.brechas : []);
   initFiltrosSoA(res.datos ? res.datos.soa : []);
@@ -523,39 +556,39 @@ function renderFilasSoA(filas) {
   filtradas.forEach(f => {
     const tr = document.createElement("tr");
 
-    let textoEstadoFormal = "Excluido (No Aplica)";
-    let statusClass = "audit-tag-excluido";
+    let textoEstado = "No Aplica";
+    let badgeClass = "exc";
 
     if (f.estado === "implementado") {
-      textoEstadoFormal = "Conforme (Implementado)";
-      statusClass = "audit-tag-conforme";
+      textoEstado = "Implementado";
+      badgeClass = "imp";
     } else if (f.estado === "parcial") {
-      textoEstadoFormal = "En Proceso (Parcial)";
-      statusClass = "audit-tag-proceso";
+      textoEstado = "Parcial (Borrador)";
+      badgeClass = "parc";
     } else if (f.estado === "no implementado") {
-      textoEstadoFormal = "Pendiente de Subsanación";
-      statusClass = "audit-tag-pendiente";
+      textoEstado = "Brecha (Faltante)";
+      badgeClass = "gap";
     }
 
-    let textoEvidencias = "<span class='text-muted-subtle'>Sin documento registrado</span>";
+    let textoEvidencias = "<span style='color:var(--ink-light);'>Sin documento</span>";
     if (f.evidencias && f.evidencias.length > 0) {
-      textoEvidencias = f.evidencias.map(doc => `<div class="doc-line-item">• ${doc}</div>`).join("");
+      textoEvidencias = f.evidencias.map(doc => `<div style="margin-bottom:2px;">• ${doc}</div>`).join("");
     }
 
-    let textoPolitica = "<span class='text-muted-subtle'>–</span>";
+    let textoPolitica = "<span style='color:var(--ink-light);'>–</span>";
     if (f.politica_relacionada) {
-      textoPolitica = `<div class="directiva-box">${f.politica_relacionada}</div>`;
+      textoPolitica = `<div style="font-size:11.5px; color:var(--ink-muted);">${f.politica_relacionada}</div>`;
     }
 
     tr.innerHTML = `
-      <td><span class="control-code">${f.control}</span></td>
+      <td><span class="code-ctrl">${f.control}</span></td>
       <td><strong>${f.nombre}</strong></td>
       <td style="text-align:center;">${f.aplica ? "Sí" : "No"}</td>
-      <td style="color:#334155;">${f.justificacion}</td>
-      <td><span class="audit-status-label ${statusClass}">${textoEstadoFormal}</span></td>
-      <td>${textoEvidencias}</td>
+      <td style="color:var(--ink-muted); font-size:12px;">${f.justificacion}</td>
+      <td><span class="badge-status-clean ${badgeClass}">${textoEstado}</span></td>
+      <td style="font-size:11.5px;">${textoEvidencias}</td>
       <td>${textoPolitica}</td>
-      <td><span class="agent-tag">${f.responsable}</span></td>
+      <td><span class="tag-clean" style="font-size:11px;">${f.responsable}</span></td>
     `;
 
     tbody.appendChild(tr);
@@ -564,27 +597,28 @@ function renderFilasSoA(filas) {
 
 function renderItemsBrechas(brechas) {
   const container = document.getElementById("contenedor-items-brechas");
+  const cuadro = document.getElementById("cuadro-brechas");
   container.innerHTML = "";
 
   if (!brechas || brechas.length === 0) {
-    container.innerHTML = "<p style='color:#065f46; font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
+    cuadro.style.display = "none";
     return;
   }
 
+  cuadro.style.display = "block";
   brechas.forEach(b => {
     const card = document.createElement("div");
-    card.className = "gap-card";
+    card.className = "brecha-item-pill";
     card.innerHTML = `
-      <strong>${b.control}: ${b.nombre}</strong>
-      <div>Estado actual: <em>${b.estado}</em></div>
-      <div class="assigned">Solicitar subsanación a: <span>${b.solicitar_a}</span></div>
+      <div class="brecha-ctrl">${b.control} — ${b.nombre}</div>
+      <div class="brecha-target">Acción: Solicitar evidencia al <strong>${b.solicitar_a}</strong></div>
     `;
     container.appendChild(card);
   });
 }
 
 function initFiltrosSoA(filas) {
-  const pills = document.querySelectorAll(".filter-pill");
+  const pills = document.querySelectorAll(".filter-pill-clean");
   pills.forEach(p => {
     p.onclick = () => {
       pills.forEach(x => x.classList.remove("active"));
@@ -595,83 +629,194 @@ function initFiltrosSoA(filas) {
   });
 }
 
-// 10. Presets JSON
-function initPresetsJSON() {
-  const select = document.getElementById("sel-preset-json");
-  const txt = document.getElementById("txt-json-payload");
-
-  const presets = {
-    unsa_responsable: {
-      operacion: "generar_soa",
-      perfil: { organizacion: "Universidad Nacional de San Agustín (UNSA)", rol: "responsable" },
-      riesgos: riesgosUNSA,
-      evidencias: evidenciasDocumentadas.map(e => ({
-        control: e.control,
-        descripcion: `[Archivo: ${e.archivo}] ${e.descripcion}`,
-        estado: e.estado
-      }))
-    },
-    unsa_encargado: {
-      operacion: "generar_soa",
-      perfil: { organizacion: "UNSA - Centro de Cómputo", rol: "encargado" },
-      riesgos: [],
-      evidencias: [
-        { control: "A.2.5.7", descripcion: "[Archivo: Clausula-Subprocesadores.pdf] Notificación formal", estado: "implementado" }
-      ]
-    },
-    unsa_ambos: {
-      operacion: "generar_soa",
-      perfil: { organizacion: "Universidad Nacional de San Agustín (UNSA)", rol: "ambos" },
-      riesgos: riesgosUNSA,
-      evidencias: evidenciasDocumentadas.map(e => ({
-        control: e.control,
-        descripcion: `[Archivo: ${e.archivo}] ${e.descripcion}`,
-        estado: e.estado
-      }))
-    },
-    unsa_sin_evidencias: {
-      operacion: "generar_soa",
-      perfil: { organizacion: "Universidad Nacional de San Agustín (UNSA)", rol: "responsable" },
-      riesgos: riesgosUNSA,
-      evidencias: []
-    }
-  };
-
-  function cargar() {
-    txt.value = JSON.stringify(presets[select.value], null, 2);
-  }
-
-  select.addEventListener("change", cargar);
-  cargar();
-}
-
-async function procesarJsonDirecto() {
-  const txt = document.getElementById("txt-json-payload");
-  try {
-    const payload = JSON.parse(txt.value);
-    await procesarPayload(payload);
-  } catch (e) {
-    alert("El formato JSON ingresado no es válido: " + e.message);
-  }
-}
-
+// 9. Skill 2: Auditoría Individual
 async function auditarControlPuntual() {
-  const ctrl = document.getElementById("sel-control-individual").value;
+  const ctrlId = document.getElementById("sel-control-individual").value;
   const rol = obtenerRolSeleccionado();
+  const resCard = document.getElementById("resultado-control-individual");
 
   const payload = {
     operacion: "verificar_control",
-    control: ctrl,
+    control: ctrlId,
     perfil: { organizacion: "UNSA", rol: rol },
     riesgos: riesgosUNSA,
     evidencias: evidenciasDocumentadas.map(e => ({
       control: e.control,
-      descripcion: `[Archivo: ${e.archivo}] ${e.descripcion}`,
+      descripcion: `[${e.archivo}] ${e.descripcion}`,
       estado: e.estado
     }))
   };
 
-  await procesarPayload(payload);
+  let res = null;
+  try {
+    const resp = await fetch(`${API_BASE}/api/controles/ejecutar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (resp.ok) res = await resp.json();
+  } catch (err) {}
+
+  if (!res) res = ejecutarMotorLocal(payload);
+
+  const d = res.datos || {};
+  let badgeClass = d.estado === "implementado" ? "imp" : (d.estado === "parcial" ? "parc" : (d.estado === "no implementado" ? "gap" : "exc"));
+  let textoEstado = d.estado === "implementado" ? "Implementado" : (d.estado === "parcial" ? "Parcial" : (d.estado === "no implementado" ? "Brecha" : "No Aplica"));
+
+  resCard.style.display = "block";
+  resCard.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div>
+        <span class="code-ctrl" style="font-size:14px;">${d.control}</span> — <strong style="font-size:14px;">${d.nombre}</strong>
+      </div>
+      <span class="badge-status-clean ${badgeClass}">${textoEstado}</span>
+    </div>
+    <div style="font-size:12.5px; color:var(--ink-muted); margin-bottom:8px;">
+      <strong>Justificación:</strong> ${d.justificacion}
+    </div>
+    <div style="font-size:12.5px; color:var(--ink-muted); margin-bottom:10px;">
+      <strong>Evidencias registradas:</strong> ${d.evidencias && d.evidencias.length ? d.evidencias.join(", ") : "Ninguna documental verificada"}
+    </div>
+    <div style="background:var(--surface-subtle); padding:10px 14px; border-radius:6px; border-left:3px solid var(--primary); font-size:12.5px;">
+      <strong>Recomendación Técnica:</strong> ${d.recomendacion || res.respuesta}
+      <div style="margin-top:4px; font-size:11.5px; color:var(--ink-subtle);">Remitir solicitud a: <strong>${d.responsable}</strong></div>
+    </div>
+  `;
+}
+
+// 10. Ventana 3: Buscador Semántico RAG & Hugging Face
+function initBuscadorRAG() {
+  const input = document.getElementById("txt-rag-query");
+  const btn = document.getElementById("btn-rag-buscar");
+  const chips = document.querySelectorAll(".rag-chip");
+
+  if (!input || !btn) return;
+
+  btn.addEventListener("click", () => ejecutarBusquedaRAG(input.value.trim()));
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") ejecutarBusquedaRAG(input.value.trim());
+  });
+
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      input.value = chip.dataset.query;
+      ejecutarBusquedaRAG(chip.dataset.query);
+    });
+  });
+}
+
+async function ejecutarBusquedaRAG(query) {
+  const container = document.getElementById("contenedor-rag-resultados");
+  if (!query) {
+    container.innerHTML = `<div style="text-align:center; color:var(--ink-subtle); padding:20px;">Por favor ingrese un término de búsqueda.</div>`;
+    return;
+  }
+
+  container.innerHTML = `<div style="text-align:center; color:var(--ink-muted); padding:25px;">Analizando consulta semántica y recuperando directivas con Hugging Face...</div>`;
+
+  let hits = [];
+  let respuestaDirecta = "";
+  let motorUtilizado = "Modelo Hugging Face + Síntesis Determinista";
+
+  // Intento vía API Backend Flask (SentenceTransformers, FAISS y Ollama si está activo)
+  try {
+    const resp = await fetch(`${API_BASE}/api/controles/ejecutar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operacion: "consultar", solicitud: query })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.datos && data.datos.respuesta_directa) {
+        respuestaDirecta = data.datos.respuesta_directa;
+      } else if (data.respuesta && data.estado === "ok") {
+        respuestaDirecta = data.respuesta;
+      }
+
+      if (data.datos && Array.isArray(data.datos.hits) && data.datos.hits.length) {
+        hits = data.datos.hits;
+      } else if (data.fuentes && data.fuentes.length) {
+        hits = [{ meta: data.fuentes.join(", "), score: data.confianza || 0.85, texto: data.respuesta }];
+      }
+
+      motorUtilizado = "Hugging Face (MiniLM-L12) + IA Generativa";
+    }
+  } catch (err) {}
+
+  // Fallback semántico local en caso de desconexión
+  if (!hits.length) {
+    const qLower = query.toLowerCase();
+    hits = KNOWLEDGE_FALLBACK.map(item => {
+      let matchCount = item.keywords.filter(k => qLower.includes(k)).length;
+      let score = matchCount > 0 ? Math.min(0.95, 0.45 + (matchCount * 0.15)) : 0.25;
+      return { meta: item.meta, score: score, texto: item.texto };
+    }).sort((a, b) => b.score - a.score).filter(h => h.score >= 0.35);
+
+    if (hits.length) {
+      respuestaDirecta = `De acuerdo con la directiva institucional **${hits[0].meta}**:\n\n${hits[0].texto}`;
+      motorUtilizado = "Base de Conocimiento Local Institucional";
+    }
+  }
+
+  if (!hits.length && !respuestaDirecta) {
+    container.innerHTML = `
+      <div style="background:#ffffff; border:1px solid var(--border); padding:24px; border-radius:var(--radius-md); text-align:center; color:var(--ink-subtle);">
+        No se encontraron directivas o cláusulas con suficiente afinidad para la consulta ingresada.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = "";
+
+  // 1. Tarjeta Destacada con la Respuesta Directa al Auditor
+  if (respuestaDirecta) {
+    const answerCard = document.createElement("div");
+    answerCard.className = "rag-answer-box";
+    answerCard.innerHTML = `
+      <div class="rag-answer-header">
+        <div class="rag-answer-title">
+          <span>Respuesta Fundamentada al Auditor</span>
+        </div>
+        <span class="rag-answer-badge">${motorUtilizado}</span>
+      </div>
+      <div class="rag-answer-body">${formatearTextoMarkdown(respuestaDirecta)}</div>
+    `;
+    container.appendChild(answerCard);
+  }
+
+  // 2. Divisor de Fuentes y Evidencias
+  if (hits.length) {
+    const divider = document.createElement("div");
+    divider.className = "rag-sources-divider";
+    divider.innerHTML = `<span>Cláusulas y Directivas Oficiales Recuperadas (${hits.length}):</span>`;
+    container.appendChild(divider);
+
+    // 3. Tarjetas de Fragmentos Recuperados
+    hits.forEach(h => {
+      const card = document.createElement("div");
+      card.className = "rag-hit-card";
+      const scorePct = Math.round((h.score || 0.8) * 100);
+
+      card.innerHTML = `
+        <div class="rag-hit-header">
+          <span class="rag-hit-source">${h.meta}</span>
+          <span class="rag-hit-score-badge">Afinidad: ${scorePct}%</span>
+        </div>
+        <div class="rag-hit-text">${h.texto}</div>
+      `;
+      container.appendChild(card);
+    });
+  }
+}
+
+// Formateador simple de negritas y saltos de línea para el texto generado
+function formatearTextoMarkdown(txt) {
+  if (!txt) return "";
+  return txt
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n\n/g, "<br/><br/>")
+    .replace(/\n/g, "<br/>");
 }
 
 function exportarJson() {
