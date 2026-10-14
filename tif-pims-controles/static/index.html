@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema de Gestión de Privacidad (PIMS) - UNSA | Agente de Controles ISO/IEC 27701</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-legacy.css">
 </head>
 <body>
   <!-- Barra Superior Institucional y de Control -->
@@ -30,15 +30,22 @@
             <span id="status-text">Agente Conectado (API :5000)</span>
           </div>
         </div>
+        <!-- BOTÓN PANEL AVANZADO -->
+        <div class="meta-pill-box">
+          <a href="panel.html" class="btn-panel-avanzado">
+            <span class="btn-panel-icon">⚡</span>
+            Panel Avanzado 3-Columnas
+          </a>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Banner de Notificación del Sistema (solo si el servidor está apagado) -->
+  <!-- Banner de Notificación del Sistema -->
   <div id="server-alert" class="server-notice" style="display: none;">
     <div class="notice-container">
-      <strong>Aviso de conectividad:</strong> No se detectó el backend Flask en el puerto 5000. 
-      Para activar el servicio Python ejecute: <code>python app.py</code>. 
+      <strong>Aviso de conectividad:</strong> No se detectó el backend Flask en el puerto 5000.
+      Para activar el servicio Python ejecute: <code>python app.py</code>.
       Actualmente el sistema está operando mediante el <em>motor de reglas local de contingencia</em>.
     </div>
   </div>
@@ -118,12 +125,10 @@
               El motor de evaluación aplica el principio de <strong>integridad probatoria</strong>: ningún control puede ser calificado como <em>Implementado</em> sin un documento oficial registrado que sustente su cumplimiento.
             </p>
 
-            <!-- Lista Espaciosa de Artefactos Probatorios -->
             <div id="contenedor-artefactos" class="artifacts-stack">
-              <!-- Renderizado dinámico con espaciado amplio -->
+              <!-- Renderizado dinámico -->
             </div>
 
-            <!-- Formulario de incorporación rápida de evidencia -->
             <div id="form-registro-rapido" class="box-subform" style="display: none;">
               <h4>Nuevo Documento de Evidencia</h4>
               <div class="form-row">
@@ -145,7 +150,7 @@
               </div>
               <div class="field-group">
                 <label>Descripción / Detalle del Contenido:</label>
-                <input type="text" id="txt-nueva-desc" placeholder="ej. Aprobación de la política de seguridad y cláusulas de confidencialidad" class="form-control">
+                <input type="text" id="txt-nueva-desc" placeholder="ej. Aprobación de la política de seguridad" class="form-control">
               </div>
               <div class="form-buttons">
                 <button class="btn-primary-sm" id="btn-guardar-documento">Guardar Documento</button>
@@ -179,7 +184,7 @@
               <div class="doc-col-main">
                 <h4>Directiva DIR-OTIC-004-UNSA</h4>
                 <p>Directiva Institucional de Privacidad y Protección de Datos Personales de la Universidad Nacional de San Agustín de Arequipa.</p>
-                <span class="doc-meta">Ubicación: knowledge/politicas/politica_privacidad_ejemplo.md · Alcance: SISUNSA, Admisión, Comedor</span>
+                <span class="doc-meta">Ubicación: knowledge/politicas/politica_privacidad_unsa.md · Alcance: SISUNSA, Admisión, Comedor</span>
               </div>
               <div class="doc-col-status">
                 <span class="badge-status vigente">Indexado FAISS</span>
@@ -304,7 +309,7 @@
           </div>
         </div>
 
-        <!-- Alerta de Gobernanza y Supervisión DPO -->
+        <!-- Alerta de Gobernanza -->
         <div class="governance-notice">
           <div class="notice-col-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2">
@@ -313,11 +318,7 @@
           </div>
           <div class="notice-col-text">
             <strong>Supervisión Humana Obligatoria (Cláusula 5.1 e ISO/IEC 27701 Cl. 9.3):</strong>
-            <p>
-              El presente documento constituye una <em>propuesta técnica preliminar</em> emitida por el Agente de Controles. 
-              Para adquirir validez vinculante en la gestión institucional de la UNSA, debe ser revisado y formalmente rubricado 
-              por el Oficial de Protección de Datos (DPO) o el Director de la Oficina de Tecnologías de Información y Comunicación (OTIC).
-            </p>
+            <p>El presente documento constituye una <em>propuesta técnica preliminar</em> emitida por el Agente de Controles. Para adquirir validez vinculante debe ser revisado y rubricado por el Oficial de Protección de Datos (DPO) o el Director de la OTIC.</p>
           </div>
         </div>
 
@@ -357,7 +358,7 @@
         <div class="gap-analysis-box" id="cuadro-brechas">
           <div class="gap-header">
             <h4>Plan de Subsanación de Brechas Identificadas</h4>
-            <p>Se listan los controles que aplican a la universidad pero carecen de implementación completa, con indicación del agente asignado para remitir la evidencia:</p>
+            <p>Se listan los controles que aplican a la universidad pero carecen de implementación completa:</p>
           </div>
           <div id="contenedor-items-brechas" class="gap-grid">
             <!-- Brechas renderizadas -->
@@ -376,6 +377,6 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app-legacy.js"></script>
 </body>
 </html>

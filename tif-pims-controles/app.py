@@ -21,6 +21,10 @@ def habilitar_cors(response):
 def inicio():
     return app.send_static_file("index.html")
 
+@app.get("/panel")
+def panel():
+    return app.send_static_file("panel.html")
+
 @app.route("/api/controles/catalogo", methods=["GET", "OPTIONS"])
 def catalogo():
     if request.method == "OPTIONS":

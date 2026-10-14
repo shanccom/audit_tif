@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIMS Agent · Panel Avanzado · UNSA</title>
+  <meta name="description" content="Panel avanzado de auditoría PIMS - 3 columnas - ISO/IEC 27701:2025 - UNSA">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <a href="/" class="back-btn" title="Volver a la interfaz principal">← Volver</a>
+        <div class="logo-badge">UNSA</div>
+        <div class="topbar-titles">
+          <span class="topbar-title">Agente de Controles PIMS · Panel Avanzado</span>
+          <span class="topbar-sub">ISO/IEC 27701:2025 · Escuela de Ingeniería de Sistemas</span>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-std">
+        <span class="std-label">ESTÁNDAR</span>
+        <span class="std-val">ISO/IEC 27701:2025</span>
+      </div>
+      <div class="status-chip" id="status-chip">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Conectando...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner sin backend -->
+  <div id="server-alert" class="server-alert" style="display:none;">
+    ⚠ Backend Flask no detectado en :5000. Ejecute <code>python app.py</code>. Modo local activo.
+  </div>
+
+  <!-- 3-COLUMN WORKSPACE -->
+  <main class="workspace">
+
+    <!-- COLUMNA 1: INPUT -->
+    <section class="col-panel" id="col-input">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-number">01</span>
+          <div>
+            <span class="col-title">Input de Agentes</span>
+            <span class="col-sub">Riesgos · Evidencias · Perfil</span>
+          </div>
+        </div>
+        <span class="col-badge input-badge">INPUT</span>
+      </div>
+
+      <div class="col-body">
+        <!-- Perfil / Rol -->
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-blue"></span>
+            Perfil de Auditoría
+          </div>
+          <div class="field-group">
+            <label class="field-label">Organización</label>
+            <input type="text" id="input-org" class="field-input" value="Universidad Nacional de San Agustín (UNSA)" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Rol PIMS</label>
+            <div class="role-tabs">
+              <label class="role-tab active" id="rt-responsable">
+                <input type="radio" name="rol" value="responsable" checked>
+                <span class="rt-name">Responsable</span>
+                <span class="rt-sub">A.1 + A.3</span>
+              </label>
+              <label class="role-tab" id="rt-encargado">
+                <input type="radio" name="rol" value="encargado">
+                <span class="rt-name">Encargado</span>
+                <span class="rt-sub">A.2 + A.3</span>
+              </label>
+              <label class="role-tab" id="rt-ambos">
+                <input type="radio" name="rol" value="ambos">
+                <span class="rt-name">Ambos</span>
+                <span class="rt-sub">A.1+A.2+A.3</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Catálogo de Controles -->
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-purple"></span>
+            Catálogo de Controles
+            <span class="section-count" id="count-controles">10</span>
+          </div>
+          <div class="controls-grid" id="controls-grid"></div>
+        </div>
+
+        <!-- Riesgos -->
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-red"></span>
+            Agente de Riesgos
+            <span class="section-count" id="count-riesgos">5</span>
+          </div>
+          <div class="risk-list" id="risk-list"></div>
+        </div>
+
+        <!-- Evidencias -->
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-green"></span>
+            Agente de Evidencia
+            <span class="section-count" id="count-evidencias">0</span>
+          </div>
+          <div class="evidence-list" id="evidence-list"></div>
+          <button class="btn-ghost-sm" id="btn-add-evidence">+ Registrar Evidencia</button>
+          <div class="mini-form" id="mini-form" style="display:none;">
+            <div class="mini-form-row">
+              <select id="mf-control" class="field-input field-input-sm"></select>
+              <select id="mf-estado" class="field-input field-input-sm">
+                <option value="implementado">Implementado</option>
+                <option value="parcial">Parcial</option>
+              </select>
+            </div>
+            <input type="text" id="mf-archivo" class="field-input" placeholder="nombre-archivo.pdf">
+            <input type="text" id="mf-desc" class="field-input" placeholder="Descripción del documento...">
+            <div class="mini-form-btns">
+              <button class="btn-confirm" id="mf-save">Guardar</button>
+              <button class="btn-cancel" id="mf-cancel">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMNA 2: SKILLS -->
+    <section class="col-panel" id="col-skills">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-number">02</span>
+          <div>
+            <span class="col-title">Ejecución de Skills</span>
+            <span class="col-sub">generar-soa · verificar-controles</span>
+          </div>
+        </div>
+        <span class="col-badge skills-badge">SKILLS</span>
+      </div>
+
+      <div class="col-body">
+        <div class="skill-selector">
+          <button class="skill-btn active" id="sk-soa" data-skill="generar_soa">
+            <span class="skill-btn-icon">⚙</span>
+            <div class="skill-btn-text">
+              <span class="skill-btn-name">generar-soa</span>
+              <span class="skill-btn-desc">Genera la SoA completa del PIMS</span>
+            </div>
+          </button>
+          <button class="skill-btn" id="sk-verificar" data-skill="verificar_control">
+            <span class="skill-btn-icon">🔍</span>
+            <div class="skill-btn-text">
+              <span class="skill-btn-name">verificar-controles</span>
+              <span class="skill-btn-desc">Audita un control puntual</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Panel generar-soa -->
+        <div class="skill-panel active" id="sp-generar_soa">
+          <div class="skill-info-box">
+            <div class="skill-info-tag">SKILL-PIMS-CONTROLES-001</div>
+            <p class="skill-info-desc">Evalúa los 10 controles del Anexo A según el rol, calcula estados probatorios y detecta brechas de cumplimiento.</p>
+          </div>
+          <button class="btn-execute" id="btn-generar-soa">
+            <span class="btn-execute-icon">▶</span>
+            Ejecutar generar-soa
+          </button>
+        </div>
+
+        <!-- Panel verificar-controles -->
+        <div class="skill-panel" id="sp-verificar_control">
+          <div class="skill-info-box">
+            <div class="skill-info-tag">SKILL-PIMS-CONTROLES-002</div>
+            <p class="skill-info-desc">Audita un control individual, evalúa su aplicabilidad y emite una prescripción técnica accionable.</p>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Control a auditar</label>
+            <select id="sel-control-individual" class="field-input"></select>
+          </div>
+          <button class="btn-execute" id="btn-verificar">
+            <span class="btn-execute-icon">▶</span>
+            Ejecutar verificar-controles
+          </button>
+        </div>
+
+        <!-- Loading -->
+        <div class="skill-loading" id="skill-loading" style="display:none;">
+          <div class="loading-spinner"></div>
+          <span>Procesando skill...</span>
+        </div>
+
+        <!-- Resultado -->
+        <div class="skill-result" id="skill-result" style="display:none;">
+          <div class="metrics-strip" id="metrics-strip" style="display:none;">
+            <div class="metric-item"><span class="metric-n" id="m-evaluados">0</span><span class="metric-l">Evaluados</span></div>
+            <div class="metric-item"><span class="metric-n text-blue" id="m-aplican">0</span><span class="metric-l">Aplican</span></div>
+            <div class="metric-item"><span class="metric-n text-green" id="m-impl">0</span><span class="metric-l">Implementados</span></div>
+            <div class="metric-item"><span class="metric-n text-amber" id="m-parciales">0</span><span class="metric-l">Parciales</span></div>
+            <div class="metric-item"><span class="metric-n text-red" id="m-brechas">0</span><span class="metric-l">Brechas</span></div>
+          </div>
+
+          <div class="filter-row" id="filter-row" style="display:none;">
+            <button class="fpill active" data-filter="todos">Todos</button>
+            <button class="fpill" data-filter="implementados">✅ Impl.</button>
+            <button class="fpill" data-filter="brechas">❌ Brechas</button>
+            <button class="fpill" data-filter="parciales">⚠ Parciales</button>
+            <button class="fpill" data-filter="excluidos">➖ Excluidos</button>
+          </div>
+
+          <div class="soa-table-wrap" id="soa-table-wrap" style="display:none;">
+            <table class="soa-table">
+              <thead>
+                <tr>
+                  <th>Control</th><th>Nombre</th><th>Aplica</th><th>Estado</th><th>Responsable</th>
+                </tr>
+              </thead>
+              <tbody id="soa-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="single-result" id="single-result" style="display:none;"></div>
+
+          <div class="gaps-section" id="gaps-section" style="display:none;">
+            <div class="gaps-title">Plan de Subsanación de Brechas</div>
+            <div class="gaps-grid" id="gaps-grid"></div>
+          </div>
+
+          <div class="export-bar">
+            <button class="btn-export" id="btn-export-json">↓ Exportar JSON</button>
+            <button class="btn-export" id="btn-imprimir">⎙ Imprimir SoA</button>
+          </div>
+
+          <div class="dpo-notice">
+            <span class="dpo-icon">⚠</span>
+            <span>Propuesta técnica — requiere revisión del DPO o OTIC (ISO/IEC 27701:2025 Cláusula 9.3)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMNA 3: RAG -->
+    <section class="col-panel" id="col-rag">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-number">03</span>
+          <div>
+            <span class="col-title">Base de Conocimiento RAG</span>
+            <span class="col-sub">FAISS · Semántica · Políticas UNSA</span>
+          </div>
+        </div>
+        <span class="col-badge rag-badge">RAG</span>
+      </div>
+
+      <div class="col-body">
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-violet"></span>
+            Consulta Semántica (FAISS)
+          </div>
+          <div class="rag-search-wrap">
+            <input type="text" id="rag-query" class="field-input rag-input" placeholder="ej. ¿Qué es una DPIA según ISO 27701?">
+            <button class="btn-rag-search" id="btn-rag-search">Buscar</button>
+          </div>
+          <div class="rag-result-box" id="rag-result-box">
+            <div class="rag-placeholder">
+              <div class="rag-placeholder-icon">⟳</div>
+              <p>Escribe una consulta para buscar en la base de conocimiento normativa.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-violet"></span>
+            Documentos Indexados
+          </div>
+          <div class="indexed-docs">
+            <div class="doc-item">
+              <div class="doc-item-icon doc-icon-md">📋</div>
+              <div class="doc-item-body">
+                <span class="doc-item-name">politica_privacidad_unsa.md</span>
+                <span class="doc-item-path">knowledge/politicas/</span>
+                <div class="doc-item-tags">
+                  <span class="doc-tag">DIR-OTIC-004-UNSA</span>
+                  <span class="doc-tag">SISUNSA · Admisión · Comedor</span>
+                </div>
+              </div>
+              <span class="doc-item-badge indexed">FAISS</span>
+            </div>
+            <div class="doc-item">
+              <div class="doc-item-icon doc-icon-norm">📖</div>
+              <div class="doc-item-body">
+                <span class="doc-item-name">resumen_27701.md</span>
+                <span class="doc-item-path">knowledge/normativa/</span>
+                <div class="doc-item-tags">
+                  <span class="doc-tag">ISO/IEC 27701:2025</span>
+                  <span class="doc-tag">Cláusulas 1–10 · Anexo A</span>
+                </div>
+              </div>
+              <span class="doc-item-badge indexed">FAISS</span>
+            </div>
+            <div class="doc-item">
+              <div class="doc-item-icon doc-icon-cat">🗂</div>
+              <div class="doc-item-body">
+                <span class="doc-item-name">catalogo_controles.json</span>
+                <span class="doc-item-path">knowledge/</span>
+                <div class="doc-item-tags">
+                  <span class="doc-tag">10 Controles Anexo A</span>
+                </div>
+              </div>
+              <span class="doc-item-badge catalog">CATÁLOGO</span>
+            </div>
+            <div class="doc-item">
+              <div class="doc-item-icon doc-icon-ev">📄</div>
+              <div class="doc-item-body">
+                <span class="doc-item-name">Evidencias Institucionales</span>
+                <span class="doc-item-path">knowledge/evidencias/ · 10 documentos</span>
+                <div class="doc-item-tags">
+                  <span class="doc-tag">RCU · TUPA · Declaraciones</span>
+                </div>
+              </div>
+              <span class="doc-item-badge evidence">EVIDENCIA</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-violet"></span>
+            Mapa Semántico: Control → Política UNSA
+          </div>
+          <div class="policy-map" id="policy-map"></div>
+        </div>
+
+        <div class="input-section">
+          <div class="section-label">
+            <span class="section-dot dot-violet"></span>
+            Configuración del Motor RAG
+          </div>
+          <div class="rag-config-grid">
+            <div class="rag-config-item"><span class="rag-cfg-label">Modelo</span><span class="rag-cfg-val">paraphrase-multilingual-MiniLM-L12-v2</span></div>
+            <div class="rag-config-item"><span class="rag-cfg-label">Índice</span><span class="rag-cfg-val">FAISS IndexFlatIP (coseno)</span></div>
+            <div class="rag-config-item"><span class="rag-cfg-label">Umbral</span><span class="rag-cfg-val">θ ≥ 0.30</span></div>
+            <div class="rag-config-item"><span class="rag-cfg-label">Top-K</span><span class="rag-cfg-val">k = 3</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span><strong>UNSA · EPIS</strong> · Auditoría de Sistemas (1704255)</span>
+    <span>Mg. Edward Vicente Zárate Carlos · Semestre 2026-B</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
