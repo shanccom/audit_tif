@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initStepper();
   initSelectorRoles();
   initModalGuia();
+  initModalVisorPDF();
   initJsonAccordion();
   renderRiesgosResumen();
   renderTablaEvidencias();
@@ -263,6 +264,56 @@ function initModalGuia() {
   }
 }
 
+// 5.1 Modal de Visor de Documentos PDF Oficiales
+function initModalVisorPDF() {
+  const modal = document.getElementById("modal-visor-pdf");
+  const btnCerrar = document.getElementById("btn-cerrar-visor-pdf");
+  const iframe = document.getElementById("iframe-visor-pdf");
+
+  if (btnCerrar && modal) {
+    btnCerrar.addEventListener("click", () => {
+      cerrarVisorPDF();
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) cerrarVisorPDF();
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal && modal.style.display === "flex") {
+      cerrarVisorPDF();
+    }
+  });
+}
+
+function abrirVisorPDF(nombreArchivo, objectUrl = null) {
+  const modal = document.getElementById("modal-visor-pdf");
+  const iframe = document.getElementById("iframe-visor-pdf");
+  const lblTitulo = document.getElementById("lbl-visor-pdf-titulo");
+  const btnTab = document.getElementById("btn-abrir-pdf-tab");
+
+  if (!modal || !iframe) return;
+
+  const urlFinal = objectUrl || `${API_BASE}/api/evidencias/${encodeURIComponent(nombreArchivo)}`;
+  if (lblTitulo) lblTitulo.textContent = nombreArchivo;
+  iframe.src = urlFinal;
+  if (btnTab) {
+    btnTab.href = urlFinal;
+  }
+
+  modal.style.display = "flex";
+}
+
+function cerrarVisorPDF() {
+  const modal = document.getElementById("modal-visor-pdf");
+  const iframe = document.getElementById("iframe-visor-pdf");
+  if (modal) modal.style.display = "none";
+  if (iframe) iframe.src = "";
+}
+
 // 6. Renderizado de Riesgos
 function renderRiesgosResumen() {
   const box = document.getElementById("contenedor-riesgos-resumen");
@@ -279,7 +330,7 @@ function renderRiesgosResumen() {
   });
 }
 
-// 7. Lista de Documentos Probatorios (Paso 1)
+// 7. Lista de Documentos Probatorios (Paso 1) con Botón Ver PDF
 function renderTablaEvidencias() {
   const container = document.getElementById("contenedor-artefactos");
   const totalLbl = document.getElementById("lbl-total-evidencias");
@@ -302,6 +353,7 @@ function renderTablaEvidencias() {
     
     const extension = e.archivo.split(".").pop().toUpperCase();
     const textoEstado = e.estado === "implementado" ? "Oficial vigente" : "Borrador";
+    const esPdf = extension === "PDF" || (e.archivo && e.archivo.toLowerCase().endsWith(".pdf"));
 
     card.innerHTML = `
       <div class="artifact-header-row">
@@ -312,11 +364,23 @@ function renderTablaEvidencias() {
         </div>
         <div class="artifact-actions-group">
           <span class="artifact-status-pill">${textoEstado}</span>
+          ${esPdf ? `<button type="button" class="btn-ver-pdf" data-index="${idx}" title="Visualizar documento PDF en el visor integrado">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>Visualizar PDF</button>` : ''}
           <button class="btn-del-artifact" data-index="${idx}" title="Eliminar este archivo">Eliminar</button>
         </div>
       </div>
       <div class="artifact-description-text">${e.descripcion}</div>
     `;
+
+    const btnVer = card.querySelector(".btn-ver-pdf");
+    if (btnVer) {
+      btnVer.addEventListener("click", () => {
+        abrirVisorPDF(e.archivo, e.objectUrl || null);
+      });
+    }
 
     card.querySelector(".btn-del-artifact").addEventListener("click", (evt) => {
       const i = parseInt(evt.target.dataset.index, 10);
@@ -328,45 +392,83 @@ function renderTablaEvidencias() {
   });
 }
 
-// 8. Formulario para Agregar Documentos de Respaldo
+// 8. Formulario para Agregar o Subir Documentos de Respaldo
 function initFormularioNuevaEvidencia() {
   const btnAbrir = document.getElementById("btn-abrir-modal-evidencia");
   const subform = document.getElementById("form-registro-rapido");
   const btnCancelar = document.getElementById("btn-cancelar-documento");
   const btnGuardar = document.getElementById("btn-guardar-documento");
+  const fileInput = document.getElementById("file-nuevo-pdf");
+  const txtArchivo = document.getElementById("txt-nuevo-archivo");
 
-  btnAbrir.addEventListener("click", () => {
-    subform.style.display = "block";
-    subform.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-
-  btnCancelar.addEventListener("click", () => {
-    subform.style.display = "none";
-  });
-
-  btnGuardar.addEventListener("click", () => {
-    const ctrl = document.getElementById("sel-nuevo-control").value;
-    const arch = document.getElementById("txt-nuevo-archivo").value.trim();
-    const desc = document.getElementById("txt-nueva-desc").value.trim();
-    const est = document.getElementById("sel-nuevo-estado").value;
-
-    if (!arch || !desc) {
-      alert("Por favor completa el nombre del archivo y una breve descripción de lo que acredita.");
-      return;
-    }
-
-    evidenciasDocumentadas.push({
-      control: ctrl,
-      archivo: arch,
-      descripcion: desc,
-      estado: est
+  if (fileInput && txtArchivo) {
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        txtArchivo.value = e.target.files[0].name;
+      }
     });
+  }
 
-    document.getElementById("txt-nuevo-archivo").value = "";
-    document.getElementById("txt-nueva-desc").value = "";
-    subform.style.display = "none";
-    renderTablaEvidencias();
-  });
+  if (btnAbrir) {
+    btnAbrir.addEventListener("click", () => {
+      subform.style.display = "block";
+      subform.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+
+  if (btnCancelar) {
+    btnCancelar.addEventListener("click", () => {
+      subform.style.display = "none";
+    });
+  }
+
+  if (btnGuardar) {
+    btnGuardar.addEventListener("click", () => {
+      const ctrl = document.getElementById("sel-nuevo-control").value;
+      const arch = (txtArchivo ? txtArchivo.value : "").trim();
+      const desc = document.getElementById("txt-nueva-desc").value.trim();
+      const est = document.getElementById("sel-nuevo-estado").value;
+
+      if (!arch || !desc) {
+        alert("Por favor completa el nombre del archivo y una breve descripción de lo que acredita.");
+        return;
+      }
+
+      let objectUrl = null;
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        try {
+          objectUrl = URL.createObjectURL(file);
+        } catch (err) {
+          // Fallback a URL estática
+        }
+
+        // Subir al backend en segundo plano si está disponible
+        if (servidorOnline) {
+          const formData = new FormData();
+          formData.append("archivo", file);
+          fetch(`${API_BASE}/api/evidencias/subir`, {
+            method: "POST",
+            body: formData
+          }).catch(err => console.warn("No se pudo persistir el PDF en disco:", err));
+        }
+      }
+
+      evidenciasDocumentadas.push({
+        control: ctrl,
+        archivo: arch,
+        descripcion: desc,
+        estado: est,
+        objectUrl: objectUrl
+      });
+
+      if (txtArchivo) txtArchivo.value = "";
+      if (fileInput) fileInput.value = "";
+      document.getElementById("txt-nueva-desc").value = "";
+      subform.style.display = "none";
+      renderTablaEvidencias();
+    });
+  }
 }
 
 function poblarSelectsControles() {
@@ -710,7 +812,14 @@ function renderFilasSoA(filas) {
 
     let textoEvidencias = "<span class='text-muted-subtle'>Sin documento</span>";
     if (f.evidencias && f.evidencias.length > 0) {
-      textoEvidencias = f.evidencias.map(doc => `<div class="doc-line-item">• ${doc}</div>`).join("");
+      textoEvidencias = f.evidencias.map(doc => {
+        const match = doc.match(/\[Archivo:\s*([^\]]+)\]/);
+        const nom = match ? match[1] : null;
+        if (nom && nom.toLowerCase().endsWith(".pdf")) {
+          return `<div class="doc-line-item">• ${doc} <button type="button" class="btn-ver-pdf btn-ver-pdf-inline" data-archivo="${nom}" style="margin-left:6px; font-size:10px; padding:2px 6px;">Visualizar PDF</button></div>`;
+        }
+        return `<div class="doc-line-item">• ${doc}</div>`;
+      }).join("");
     }
 
     let textoPolitica = "<span class='text-muted-subtle'>–</span>";
@@ -721,13 +830,20 @@ function renderFilasSoA(filas) {
     tr.innerHTML = `
       <td><span class="control-code">${f.control}</span></td>
       <td><strong>${f.nombre}</strong></td>
-      <td style="text-align:center;">${f.aplica ? '<span style="color:#166534; font-weight:700;">Sí</span>' : '<span style="color:var(--slate-400);">No</span>'}</td>
-      <td style="color:var(--slate-700); line-height:1.4;">${f.justificacion}</td>
+      <td style="text-align:center;">${f.aplica ? '<span style="color:var(--red-primary); font-weight:700;">Sí</span>' : '<span style="color:var(--text-muted);">No</span>'}</td>
+      <td style="color:var(--text-body); line-height:1.4;">${f.justificacion}</td>
       <td><span class="audit-status-label ${statusClass}">${textoEstadoFormal}</span></td>
       <td>${textoEvidencias}</td>
       <td>${textoPolitica}</td>
       <td><span class="agent-tag">${f.responsable}</span></td>
     `;
+
+    // Vincular visor de PDF para evidencias inline de la tabla
+    tr.querySelectorAll(".btn-ver-pdf-inline").forEach(btn => {
+      btn.addEventListener("click", () => {
+        abrirVisorPDF(btn.dataset.archivo);
+      });
+    });
 
     tbody.appendChild(tr);
   });
@@ -738,7 +854,7 @@ function renderItemsBrechas(brechas) {
   container.innerHTML = "";
 
   if (!brechas || brechas.length === 0) {
-    container.innerHTML = "<p style='color:#166534; font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
+    container.innerHTML = "<p style='color:var(--red-primary); font-weight:600;'>No se detectaron brechas de cumplimiento para el alcance actual.</p>";
     return;
   }
 

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from agents.controles import AgenteControles
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +33,47 @@ def ejecutar():
         return "", 204
     entrada = request.get_json(silent=True) or {}
     return jsonify(controles.ejecutar(entrada))
+
+@app.route("/api/evidencias", methods=["GET"])
+def listar_evidencias():
+    evidencias_dir = os.path.join(knowledge_dir, "evidencias")
+    if not os.path.exists(evidencias_dir):
+        return jsonify([])
+    archivos = []
+    for f in os.listdir(evidencias_dir):
+        ruta = os.path.join(evidencias_dir, f)
+        if os.path.isfile(ruta):
+            archivos.append({
+                "archivo": f,
+                "es_pdf": f.lower().endswith(".pdf"),
+                "tamano": os.path.getsize(ruta)
+            })
+    return jsonify(archivos)
+
+@app.route("/api/evidencias/subir", methods=["POST"])
+def subir_evidencia():
+    if "archivo" not in request.files:
+        return jsonify({"error": "No se envió ningún archivo"}), 400
+    archivo = request.files["archivo"]
+    if archivo.filename == "":
+        return jsonify({"error": "Nombre de archivo vacío"}), 400
+    
+    # Sanitizar nombre simple manteniendo extension
+    nombre_seguro = os.path.basename(archivo.filename).replace(" ", "_")
+    evidencias_dir = os.path.join(knowledge_dir, "evidencias")
+    os.makedirs(evidencias_dir, exist_ok=True)
+    destino = os.path.join(evidencias_dir, nombre_seguro)
+    archivo.save(destino)
+    return jsonify({
+        "mensaje": "Archivo guardado correctamente",
+        "archivo": nombre_seguro,
+        "url": f"/api/evidencias/{nombre_seguro}"
+    })
+
+@app.route("/api/evidencias/<path:filename>", methods=["GET"])
+def ver_evidencia(filename):
+    evidencias_dir = os.path.join(knowledge_dir, "evidencias")
+    return send_from_directory(evidencias_dir, filename)
 
 if __name__ == "__main__":
     import os
