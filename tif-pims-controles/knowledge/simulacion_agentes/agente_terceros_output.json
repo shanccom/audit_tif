@@ -1,0 +1,31 @@
+{
+  "agente_emisor": "agente_terceros",
+  "version": "1.0.0",
+  "fecha_emision": "2026-10-14T08:38:00Z",
+  "alcance_auditoria": "Proveedores Cloud y Contratistas Externos de la UNSA",
+  "proveedores_evaluados": [
+    {
+      "proveedor": "Google LLC (Google Workspace for Education)",
+      "servicio": "Correo institucional @unsa.edu.pe, Google Classroom y Drive",
+      "rol_proveedor": "Encargado del Tratamiento (PII Processor)",
+      "instrumento_legal": "Data Processing Amendment (DPA) institucional y cláusulas contractuales tipo",
+      "control_iso27701": "A.1.2.7",
+      "archivo_evidencia": "Contrato-DPA-Google-Workspace-UNSA.pdf",
+      "estado_cumplimiento": "implementado"
+    },
+    {
+      "proveedor": "Consorcio Red Dorsal / Proveedor de Enlace de Internet",
+      "servicio": "Conectividad de fibra óptica entre campus Ingenierías, Sociales y Biomédicas",
+      "rol_proveedor": "Encargado de Telecomunicaciones",
+      "instrumento_legal": "Contrato de Servicio Público y Acuerdos de Nivel de Servicio (SLA)",
+      "control_iso27701": "A.1.2.7",
+      "estado_cumplimiento": "implementado"
+    }
+  ],
+  "evaluacion_subcontratistas_a257": {
+    "control": "A.2.5.7",
+    "nombre": "Divulgación de subcontratistas",
+    "aplica_a_unsa": false,
+    "justificacion": "Excluido: la UNSA actúa como Responsable del Tratamiento y no como Encargada de terceros."
+  }
+}

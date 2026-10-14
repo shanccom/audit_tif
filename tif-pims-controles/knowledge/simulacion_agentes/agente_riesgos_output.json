@@ -1,0 +1,55 @@
+{
+  "agente_emisor": "agente_riesgos",
+  "version": "1.0.0",
+  "fecha_emision": "2026-10-14T08:35:00Z",
+  "metodologia": "ISO/IEC 27005:2022 armonizada con ISO/IEC 27701:2025 Cláusula 6.1.2",
+  "matriz_riesgos_privacidad": [
+    {
+      "id": "R-UNSA-01",
+      "descripcion": "Riesgo de acceso no autorizado o filtración de notas y DNI en SISUNSA por brecha de autenticación",
+      "activo_afectado": "Base de Datos de Estudiantes y Actas de Notas",
+      "impacto": "Alto",
+      "probabilidad": "Media",
+      "nivel_riesgo": "Alto",
+      "controles_mitigacion": ["A.1.2.6", "A.3.12"],
+      "estado_tratamiento": "En mitigación con monitoreo CSIRT"
+    },
+    {
+      "id": "R-UNSA-02",
+      "descripcion": "Tratamiento de huellas dactilares biométricas en Comedor Universitario sin informe DPIA finalizado",
+      "activo_afectado": "Lectores biométricos y servidor local DUDE",
+      "impacto": "Crítico",
+      "probabilidad": "Alta",
+      "nivel_riesgo": "Crítico",
+      "controles_mitigacion": ["A.1.2.6"],
+      "estado_tratamiento": "Requiere formalización de plantilla criptográfica hash irreversible"
+    },
+    {
+      "id": "R-UNSA-03",
+      "descripcion": "Demora en tramitación de solicitudes de acceso, rectificación y cancelación de legajos (Derechos ARCO)",
+      "activo_afectado": "Mesa de Partes Virtual y Secretaría General",
+      "impacto": "Medio",
+      "probabilidad": "Media",
+      "nivel_riesgo": "Medio",
+      "controles_mitigacion": ["A.1.3.7", "A.1.3.9"],
+      "estado_tratamiento": "Mitigado con procedimiento TUPA y correo odp@unsa.edu.pe"
+    }
+  ],
+  "riesgos_consolidados_para_soa": [
+    {
+      "id": "R-UNSA-01",
+      "descripcion": "Riesgo de acceso no autorizado o filtración de notas y DNI en SISUNSA",
+      "controles": ["A.1.2.6", "A.3.12"]
+    },
+    {
+      "id": "R-UNSA-02",
+      "descripcion": "Tratamiento de huellas dactilares en Comedor Universitario sin DPIA completo",
+      "controles": ["A.1.2.6"]
+    },
+    {
+      "id": "R-UNSA-03",
+      "descripcion": "Demora en tramitación de solicitudes de acceso y rectificación de datos (ARCO)",
+      "controles": ["A.1.3.7", "A.1.3.9"]
+    }
+  ]
+}

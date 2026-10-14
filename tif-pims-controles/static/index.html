@@ -215,28 +215,121 @@
     <!-- PESTAÑA 3: CONTRATO JSON / N8N -->
     <section id="tab-contrato" class="tab-pane">
       <div class="panel">
-        <div class="panel-header">
-          <h3>Contrato de Datos JSON (Protocolo de Interoperabilidad para n8n)</h3>
+        <div class="panel-header header-with-action">
+          <div>
+            <h3>Simulador de Pipeline Multi-Agente (MAS) e Integración n8n</h3>
+            <p class="section-help" style="margin-top: 4px; margin-bottom: 0;">
+              Simulación interactiva: los agentes upstream de la UNSA (Inventario, Riesgos, Terceros, Derechos y Evidencias) alimentan al bus <strong>n8n</strong> y el <strong>Agente de Controles</strong> procesa el contrato JSON para generar la SoA bajo ISO/IEC 27701:2025.
+            </p>
+          </div>
+          <button class="btn-primary mas-hero-btn" id="btn-orquestar-mas-n8n">
+            🚀 Ejecutar Pipeline MAS Completo
+          </button>
         </div>
         <div class="panel-body">
-          <p class="section-help">
-            Estructura tipada enviada a través de peticiones HTTP POST hacia el Agente de Controles desde el bus de integración o la plataforma <strong>n8n</strong>.
-          </p>
+          <!-- Flujo visual del pipeline (Agent Grid) -->
+          <div class="mas-pipeline-wrapper">
+            <div class="mas-pipeline-header">
+              <span class="mas-step-tag">FASE 1: AGENTES ESPECIALIZADOS UPSTREAM (UNSA)</span>
+              <span class="mas-flow-hint">Haga clic en cualquier agente para inspeccionar su contrato JSON individual</span>
+            </div>
 
-          <div class="field-group">
-            <label for="sel-preset-json">Escenario Preconfigurado:</label>
-            <select id="sel-preset-json" class="form-control" style="max-width: 450px;">
-              <option value="unsa_responsable">Caso Principal: UNSA como Responsable (SISUNSA y Comedor)</option>
-              <option value="unsa_encargado">Caso Secundario: UNSA como Encargado de Tratamiento</option>
-              <option value="unsa_ambos">Caso Exhaustivo: UNSA con Ambos Roles Simultáneos</option>
-              <option value="unsa_sin_evidencias">Auditoría Cero: UNSA sin Documentación Presentada</option>
-            </select>
+            <div class="mas-agents-grid">
+              <!-- Agente 1: Inventario -->
+              <div class="mas-agent-card" data-agent="agente_inventario_output" id="card-agente-inventario">
+                <div class="card-badge">RAT &amp; Activos</div>
+                <div class="card-title">📋 Agente de Inventario</div>
+                <div class="card-desc">Registros de Actividades de Tratamiento (SISUNSA, Comedor, Admisión).</div>
+                <div class="card-controls">Alimenta: <strong>A.1.2.2</strong>, <strong>A.1.2.9</strong></div>
+              </div>
+
+              <!-- Agente 2: Riesgos -->
+              <div class="mas-agent-card" data-agent="agente_riesgos_output" id="card-agente-riesgos">
+                <div class="card-badge">ISO 27005</div>
+                <div class="card-title">⚠️ Agente de Riesgos</div>
+                <div class="card-desc">Matriz de amenazas a la privacidad (R-UNSA-01 a R-UNSA-03).</div>
+                <div class="card-controls">Alimenta: <strong>A.1.2.6</strong>, <strong>A.3.12</strong></div>
+              </div>
+
+              <!-- Agente 3: Terceros -->
+              <div class="mas-agent-card" data-agent="agente_terceros_output" id="card-agente-terceros">
+                <div class="card-badge">DPA &amp; Proveedores</div>
+                <div class="card-title">🤝 Agente de Terceros</div>
+                <div class="card-desc">Contratos con encargados y DPA Google Workspace UNSA.</div>
+                <div class="card-controls">Alimenta: <strong>A.1.2.7</strong>, <strong>A.2.5.7</strong></div>
+              </div>
+
+              <!-- Agente 4: Derechos -->
+              <div class="mas-agent-card" data-agent="agente_derechos_output" id="card-agente-derechos">
+                <div class="card-badge">ARCO Ley 29733</div>
+                <div class="card-title">⚖️ Agente de Derechos</div>
+                <div class="card-desc">Canales formales de ejercicio ARCO (Mesa de Partes San Agustín 115).</div>
+                <div class="card-controls">Alimenta: <strong>A.1.3.7</strong>, <strong>A.1.3.9</strong></div>
+              </div>
+
+              <!-- Agente 5: Evidencias -->
+              <div class="mas-agent-card" data-agent="agente_evidencia_output" id="card-agente-evidencias">
+                <div class="card-badge">8 PDFs / SHA-256</div>
+                <div class="card-title">📂 Agente de Evidencia</div>
+                <div class="card-desc">Repositorio probatorio documental descargado de UNSA.</div>
+                <div class="card-controls">Sustenta: <strong>Calificación SoA</strong></div>
+              </div>
+
+              <!-- Agente 6 (Consolidador): n8n -->
+              <div class="mas-agent-card n8n-card active" data-agent="payload_consolidado_n8n" id="card-agente-n8n">
+                <div class="card-badge n8n-badge">Orquestador</div>
+                <div class="card-title">🔄 Orquestador n8n</div>
+                <div class="card-desc">Consolida los 5 agentes en el contrato HTTP POST final.</div>
+                <div class="card-controls">Sintetiza: <strong>Contrato Completo</strong></div>
+              </div>
+            </div>
+
+            <!-- Flecha de convergencia -->
+            <div class="mas-pipeline-convergence">
+              <div class="convergence-line"></div>
+              <div class="convergence-badge">
+                <span>⬇️ FLUJO HTTP POST CONVERGENTE ⬇️</span>
+                <strong>Destino: Agente de Controles (Skill: generar_soa en Flask :5000)</strong>
+              </div>
+            </div>
           </div>
 
-          <textarea id="txt-json-payload" class="code-box" rows="15" spellcheck="false"></textarea>
+          <!-- Inspector del Contrato JSON -->
+          <div class="inspector-section" style="margin-top: 20px;">
+            <div class="inspector-header">
+              <div class="inspector-info">
+                <span id="lbl-inspector-agente" class="badge-tag ok">Orquestador n8n (Payload Consolidado)</span>
+                <span id="lbl-inspector-desc" style="font-size: 12px; color: var(--slate-600); margin-left: 10px;">
+                  Contrato consolidado listo para generar la SoA con 10 controles evaluados.
+                </span>
+              </div>
+              <div class="inspector-actions">
+                <button class="btn-sm" id="btn-copiar-json" title="Copiar JSON al portapapeles">📋 Copiar JSON</button>
+                <button class="btn-sm" id="btn-restaurar-consolidado" title="Cargar el payload consolidado completo">🔄 Cargar Consolidado n8n</button>
+              </div>
+            </div>
 
-          <div class="form-buttons" style="margin-top: 14px;">
-            <button class="btn-primary" id="btn-enviar-json">Procesar Contrato JSON</button>
+            <textarea id="txt-json-payload" class="code-box" rows="16" spellcheck="false"></textarea>
+
+            <div class="mas-action-footer">
+              <div class="mas-footer-presets">
+                <label for="sel-preset-json" style="font-weight: 600; font-size: 12px;">Otros Escenarios:</label>
+                <select id="sel-preset-json" class="form-control" style="max-width: 320px; font-size: 12px; padding: 4px 8px;">
+                  <option value="pipeline_consolidado">✨ Pipeline MAS Consolidado (Recomendado)</option>
+                  <option value="unsa_responsable">Caso: UNSA como Responsable</option>
+                  <option value="unsa_encargado">Caso: UNSA como Encargado</option>
+                  <option value="unsa_ambos">Caso: UNSA Ambos Roles</option>
+                  <option value="unsa_sin_evidencias">Auditoría Cero: Sin Documentos</option>
+                </select>
+              </div>
+
+              <div class="mas-footer-buttons">
+                <button class="btn-secondary" id="btn-enviar-json">Procesar JSON Actual</button>
+                <button class="btn-primary" id="btn-ejecutar-simulacion-soa" style="background:#5c111e; font-weight:700;">
+                  🚀 Ejecutar Skill: generar_soa con este Contrato
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,36 @@
+{
+  "agente_emisor": "agente_derechos",
+  "version": "1.0.0",
+  "fecha_emision": "2026-10-14T08:40:00Z",
+  "alcance_auditoria": "Gestión y Garantía de Derechos ARCO (Ley 29733 & ISO/IEC 27701)",
+  "canales_operativos_unsa": [
+    {
+      "canal": "Mesa de Partes General (Presencial)",
+      "ubicacion": "Calle San Agustín N° 115, Cercado de Arequipa (Secretaría General)",
+      "estado": "Operativo"
+    },
+    {
+      "canal": "Oficina de Protección de Datos (Virtual)",
+      "correo": "odp@unsa.edu.pe",
+      "estado": "Operativo"
+    }
+  ],
+  "procedimientos_tupa_verificados": [
+    {
+      "derecho": "Acceso, Rectificación y Cancelación de Datos Personales",
+      "normativa": "TUPA UNSA / D.S. N° 003-2013-JUS",
+      "control_iso27701": "A.1.3.7",
+      "archivo_evidencia": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "estado_cumplimiento": "implementado",
+      "plazo_maximo_dias": 10
+    },
+    {
+      "derecho": "Expedición de Copia Legible de Datos (Portabilidad PII)",
+      "normativa": "TUPA UNSA - Grados, Títulos y Certificados",
+      "control_iso27701": "A.1.3.9",
+      "archivo_evidencia": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "estado_cumplimiento": "implementado",
+      "plazo_maximo_dias": 20
+    }
+  ]
+}

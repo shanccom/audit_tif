@@ -1,0 +1,72 @@
+{
+  "agente_emisor": "agente_evidencia",
+  "version": "1.0.0",
+  "fecha_emision": "2026-10-14T08:42:00Z",
+  "repositorio_base": "knowledge/evidencias/",
+  "evidencias_auditadas_unsa": [
+    {
+      "control": "A.1.2.2",
+      "archivo": "reglamento_matricula_2020_modi.pdf",
+      "descripcion": "Reglamento General de Matrícula (RCU N° 0127-2020): Fines académicos legítimos, deberes de estudiantes y registro en SISUNSA",
+      "tamano_bytes": 472125,
+      "estado": "implementado",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.1.2.2",
+      "archivo": "Declaracion-Jurada-Admision-Mayor-Edad.pdf",
+      "descripcion": "SISADMISION: Cláusula de consentimiento informado previo y tratamiento biométrico de postulantes (DUA-UNSA)",
+      "tamano_bytes": 121856,
+      "estado": "implementado",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.1.2.9",
+      "archivo": "Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf",
+      "descripcion": "Resoluciones de Consejo Universitario (RCU 0127-2020, RCU 0009-2026): Registro oficial RAT de bancos de datos SISUNSA y Campus Virtual",
+      "tamano_bytes": 37888,
+      "estado": "implementado",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.1.2.6",
+      "archivo": "RCU-0127-2025-Reglamento-Comedor-Universitario.pdf",
+      "descripcion": "Reglamento de Comedor Universitario (RCU N° 0127-2025 - DUDE): DPIA para validación socioeconómica y huellas dactilares de comensales",
+      "tamano_bytes": 1240031,
+      "estado": "parcial",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.1.3.7",
+      "archivo": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "descripcion": "TUPA Institucional: Procedimiento oficial de Derechos ARCO ante Secretaría General (San Agustín 115) y odp@unsa.edu.pe",
+      "tamano_bytes": 49152,
+      "estado": "implementado",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.1.3.9",
+      "archivo": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "descripcion": "TUPA Institucional: Expedición de constancias y copia legible de PII para estudiantes y egresados agustinos",
+      "tamano_bytes": 49152,
+      "estado": "implementado",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.1.2.7",
+      "archivo": "Contrato-DPA-Google-Workspace-UNSA.pdf",
+      "descripcion": "Acuerdo de Protección de Datos (DPA) para servicio de correo @unsa.edu.pe y almacenamiento educativo",
+      "tamano_bytes": 105472,
+      "estado": "implementado",
+      "verificacion_hash": "SHA256-VERIFICADO"
+    },
+    {
+      "control": "A.3.12",
+      "archivo": "Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx",
+      "descripcion": "Borrador de protocolo de contención y contingencia ante brechas en banco de datos Seguridad y Vigilancia (OTI-UNSA)",
+      "tamano_bytes": 84120,
+      "estado": "parcial",
+      "verificacion_hash": "SHA256-BORRADOR"
+    }
+  ]
+}

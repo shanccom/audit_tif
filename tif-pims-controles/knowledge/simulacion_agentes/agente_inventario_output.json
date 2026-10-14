@@ -1,0 +1,63 @@
+{
+  "agente_emisor": "agente_inventario",
+  "version": "1.0.0",
+  "fecha_emision": "2026-10-14T08:30:00Z",
+  "entidad": {
+    "nombre": "Universidad Nacional de San Agustín de Arequipa (UNSA)",
+    "ruc": "20144908078",
+    "domicilio": "Calle Santa Catalina N° 117, Cercado de Arequipa",
+    "rol_principal": "responsable"
+  },
+  "sistemas_mapeados": [
+    {
+      "id": "SIS-01",
+      "nombre": "SISUNSA (Sistema Integrado de la UNSA)",
+      "proceso": "Formación Académica e Investigación",
+      "tipo": "Misional / Core",
+      "banco_datos": "Estudiantes y Grados y Títulos",
+      "datos_tratados": ["DNI", "Nombres", "Notas", "Historial Curricular", "Correo Institucional"],
+      "controles_asociados": ["A.1.2.2", "A.1.2.9"]
+    },
+    {
+      "id": "SIS-02",
+      "nombre": "SISADMISION (Portal de Admisión)",
+      "proceso": "Admisión y Selección",
+      "tipo": "Misional / Core",
+      "banco_datos": "Postulantes",
+      "datos_tratados": ["DNI", "Fotografía Digital", "Huella Dactilar Biometría", "Datos de Apoderado para Menores"],
+      "controles_asociados": ["A.1.2.2", "A.1.2.9"]
+    },
+    {
+      "id": "SIS-03",
+      "nombre": "Comedor Universitario (DUDE)",
+      "proceso": "Bienestar Universitario",
+      "tipo": "Apoyo",
+      "banco_datos": "Comedor Universitario y Asistencia Social",
+      "datos_tratados": ["Ficha Socioeconómica", "Huella Dactilar de Comensales", "Ingresos Familiares"],
+      "controles_asociados": ["A.1.2.6", "A.1.2.9"]
+    },
+    {
+      "id": "SIS-04",
+      "nombre": "Campus Virtual / DUTIC",
+      "proceso": "Educación Virtual y Docencia",
+      "tipo": "Apoyo",
+      "banco_datos": "Estudiantes y Recursos Humanos",
+      "datos_tratados": ["Credenciales", "Interacciones Académicas", "Evaluaciones"],
+      "controles_asociados": ["A.1.2.2", "A.3.17"]
+    }
+  ],
+  "registro_actividades_tratamiento_rat": {
+    "bancos_inscritos_anpdp": [
+      "Estudiantes",
+      "Postulantes",
+      "Recursos Humanos",
+      "Usuarios de Biblioteca",
+      "Grados y Títulos",
+      "Convenios y Becas",
+      "Seguridad y Vigilancia",
+      "Comedor Universitario"
+    ],
+    "estado_rat": "completo",
+    "oficial_responsable": "Oficina de Tecnologías de la Información (OTI)"
+  }
+}

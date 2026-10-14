@@ -1,0 +1,80 @@
+{
+  "orquestador": "n8n_pims_workflow",
+  "version_pipeline": "2.4.0",
+  "timestamp": "2026-10-14T08:45:00Z",
+  "operacion": "generar_soa",
+  "perfil": {
+    "organizacion": "Universidad Nacional de San Agustín de Arequipa (UNSA)",
+    "rol": "responsable",
+    "ruc": "20144908078",
+    "domicilio": "Calle Santa Catalina N° 117, Cercado de Arequipa",
+    "alcance": "Procesos Misionales de Formación Académica, Admisión e Investigación, y Procesos de Apoyo de OTI, DUDE y Secretaría General"
+  },
+  "riesgos": [
+    {
+      "id": "R-UNSA-01",
+      "descripcion": "Riesgo de acceso no autorizado o filtración de notas y DNI en SISUNSA",
+      "controles": ["A.1.2.6", "A.3.12"]
+    },
+    {
+      "id": "R-UNSA-02",
+      "descripcion": "Tratamiento de huellas dactilares en Comedor Universitario sin DPIA completo",
+      "controles": ["A.1.2.6"]
+    },
+    {
+      "id": "R-UNSA-03",
+      "descripcion": "Demora en tramitación de solicitudes de acceso y rectificación de datos (ARCO)",
+      "controles": ["A.1.3.7", "A.1.3.9"]
+    }
+  ],
+  "evidencias": [
+    {
+      "control": "A.1.2.2",
+      "archivo": "reglamento_matricula_2020_modi.pdf",
+      "descripcion": "[Archivo: reglamento_matricula_2020_modi.pdf] Reglamento General de Matrícula (RCU N° 0127-2020): Fines académicos legítimos, deberes de estudiantes y registro en SISUNSA",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.2",
+      "archivo": "Declaracion-Jurada-Admision-Mayor-Edad.pdf",
+      "descripcion": "[Archivo: Declaracion-Jurada-Admision-Mayor-Edad.pdf] SISADMISION: Cláusula de consentimiento informado previo y tratamiento biométrico de postulantes (DUA-UNSA)",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.9",
+      "archivo": "Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf",
+      "descripcion": "[Archivo: Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf] Resoluciones de Consejo Universitario (RCU 0127-2020, RCU 0009-2026): Registro oficial RAT de bancos de datos SISUNSA y Campus Virtual",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.6",
+      "archivo": "RCU-0127-2025-Reglamento-Comedor-Universitario.pdf",
+      "descripcion": "[Archivo: RCU-0127-2025-Reglamento-Comedor-Universitario.pdf] Reglamento de Comedor Universitario (RCU N° 0127-2025 - DUDE): DPIA para validación socioeconómica y huellas dactilares de comensales",
+      "estado": "parcial"
+    },
+    {
+      "control": "A.1.3.7",
+      "archivo": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "descripcion": "[Archivo: TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf] TUPA Institucional: Procedimiento oficial de Derechos ARCO ante Secretaría General (San Agustín 115) y odp@unsa.edu.pe",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.3.9",
+      "archivo": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "descripcion": "[Archivo: TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf] TUPA Institucional: Expedición de constancias y copia legible de PII para estudiantes y egresados agustinos",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.7",
+      "archivo": "Contrato-DPA-Google-Workspace-UNSA.pdf",
+      "descripcion": "[Archivo: Contrato-DPA-Google-Workspace-UNSA.pdf] Acuerdo de Protección de Datos (DPA) para servicio de correo @unsa.edu.pe y almacenamiento educativo",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.3.12",
+      "archivo": "Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx",
+      "descripcion": "[Archivo: Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx] Borrador de protocolo de contención y contingencia ante brechas en banco de datos Seguridad y Vigilancia (OTI-UNSA)",
+      "estado": "parcial"
+    }
+  ]
+}

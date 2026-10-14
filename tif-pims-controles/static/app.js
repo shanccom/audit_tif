@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderTablaEvidencias();
   initFormularioNuevaEvidencia();
   initPresetsJSON();
+  initSimuladorMAS();
   await verificarConexionServidor();
   poblarSelectsControles();
 
@@ -595,12 +596,134 @@ function initFiltrosSoA(filas) {
   });
 }
 
-// 10. Presets JSON
+// 10. Presets JSON y Simulador Multi-Agente (MAS)
+const METADATA_AGENTES_MAS = {
+  agente_inventario_output: {
+    nombre: "📋 Agente de Inventario y Activos (UNSA)",
+    tag: "RAT & Activos",
+    desc: "Salida del Agente de Inventario: Mapeo de sistemas institucionales (SISUNSA, Comedor, Admisión) y Banco de Datos RAT. Alimenta A.1.2.2 y A.1.2.9.",
+    archivo: "agente_inventario_output.json"
+  },
+  agente_riesgos_output: {
+    nombre: "⚠️ Agente de Gestión de Riesgos de Privacidad",
+    tag: "ISO 27005",
+    desc: "Salida del Agente de Riesgos: Matriz de riesgos de privacidad (R-UNSA-01 a R-UNSA-03) evaluada bajo ISO/IEC 27005. Alimenta A.1.2.6 y A.3.12.",
+    archivo: "agente_riesgos_output.json"
+  },
+  agente_terceros_output: {
+    nombre: "🤝 Agente de Terceros y Transferencias",
+    tag: "DPA & Proveedores",
+    desc: "Salida del Agente de Terceros: Auditoría de contratos con encargados y Data Processing Addendum (DPA Google Workspace). Alimenta A.1.2.7 y A.2.5.7.",
+    archivo: "agente_terceros_output.json"
+  },
+  agente_derechos_output: {
+    nombre: "⚖️ Agente de Derechos ARCO",
+    tag: "ARCO Ley 29733",
+    desc: "Salida del Agente de Derechos: Procedimientos y canales formales de atención ARCO (Mesa de Partes San Agustín 115 y odp@unsa.edu.pe). Alimenta A.1.3.7 y A.1.3.9.",
+    archivo: "agente_derechos_output.json"
+  },
+  agente_evidencia_output: {
+    nombre: "📂 Agente de Repositorio Probatorio",
+    tag: "8 PDFs / SHA-256",
+    desc: "Salida del Agente de Evidencia: 8 artefactos probatorios oficiales con verificación criptográfica SHA-256 e indexación FAISS.",
+    archivo: "agente_evidencia_output.json"
+  },
+  payload_consolidado_n8n: {
+    nombre: "🔄 Orquestador n8n (Payload Consolidado)",
+    tag: "Orquestador MAS",
+    desc: "Contrato consolidado por el bus n8n listo para enviar al Agente de Controles y generar la SoA bajo ISO/IEC 27701:2025.",
+    archivo: "payload_consolidado_n8n.json"
+  }
+};
+
+const PAYLOAD_CONSOLIDADO_FALLBACK = {
+  "orquestador": "n8n_pims_workflow",
+  "version_pipeline": "2.4.0",
+  "timestamp": "2026-10-14T08:45:00Z",
+  "operacion": "generar_soa",
+  "perfil": {
+    "organizacion": "Universidad Nacional de San Agustín de Arequipa (UNSA)",
+    "rol": "responsable",
+    "ruc": "20144908078",
+    "domicilio": "Calle Santa Catalina N° 117, Cercado de Arequipa",
+    "alcance": "Procesos Misionales de Formación Académica, Admisión e Investigación, y Procesos de Apoyo de OTI, DUDE y Secretaría General"
+  },
+  "riesgos": [
+    {
+      "id": "R-UNSA-01",
+      "descripcion": "Riesgo de acceso no autorizado o filtración de notas y DNI en SISUNSA",
+      "controles": ["A.1.2.6", "A.3.12"]
+    },
+    {
+      "id": "R-UNSA-02",
+      "descripcion": "Tratamiento de huellas dactilares en Comedor Universitario sin DPIA completo",
+      "controles": ["A.1.2.6"]
+    },
+    {
+      "id": "R-UNSA-03",
+      "descripcion": "Demora en tramitación de solicitudes de acceso y rectificación de datos (ARCO)",
+      "controles": ["A.1.3.7", "A.1.3.9"]
+    }
+  ],
+  "evidencias": [
+    {
+      "control": "A.1.2.2",
+      "archivo": "reglamento_matricula_2020_modi.pdf",
+      "descripcion": "[Archivo: reglamento_matricula_2020_modi.pdf] Reglamento General de Matrícula (RCU N° 0127-2020): Fines académicos legítimos, deberes de estudiantes y registro en SISUNSA",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.2",
+      "archivo": "Declaracion-Jurada-Admision-Mayor-Edad.pdf",
+      "descripcion": "[Archivo: Declaracion-Jurada-Admision-Mayor-Edad.pdf] SISADMISION: Cláusula de consentimiento informado previo y tratamiento biométrico de postulantes (DUA-UNSA)",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.9",
+      "archivo": "Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf",
+      "descripcion": "[Archivo: Compilacion-Resoluciones-Sistemas-Oficiales-UNSA.pdf] Resoluciones de Consejo Universitario (RCU 0127-2020, RCU 0009-2026): Registro oficial RAT de bancos de datos SISUNSA y Campus Virtual",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.6",
+      "archivo": "RCU-0127-2025-Reglamento-Comedor-Universitario.pdf",
+      "descripcion": "[Archivo: RCU-0127-2025-Reglamento-Comedor-Universitario.pdf] Reglamento de Comedor Universitario (RCU N° 0127-2025 - DUDE): DPIA para validación socioeconómica y huellas dactilares de comensales",
+      "estado": "parcial"
+    },
+    {
+      "control": "A.1.3.7",
+      "archivo": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "descripcion": "[Archivo: TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf] TUPA Institucional: Procedimiento oficial de Derechos ARCO ante Secretaría General (San Agustín 115) y odp@unsa.edu.pe",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.3.9",
+      "archivo": "TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf",
+      "descripcion": "[Archivo: TUPA-Procedimiento-Derechos-ARCO-UNSA.pdf] TUPA Institucional: Expedición de constancias y copia legible de PII para estudiantes y egresados agustinos",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.1.2.7",
+      "archivo": "Contrato-DPA-Google-Workspace-UNSA.pdf",
+      "descripcion": "[Archivo: Contrato-DPA-Google-Workspace-UNSA.pdf] Acuerdo de Protección de Datos (DPA) para servicio de correo @unsa.edu.pe y almacenamiento educativo",
+      "estado": "implementado"
+    },
+    {
+      "control": "A.3.12",
+      "archivo": "Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx",
+      "descripcion": "[Archivo: Protocolo-Seguridad-CSIRT-UNSA-v0.2.docx] Borrador de protocolo de contención y contingencia ante brechas en banco de datos Seguridad y Vigilancia (OTI-UNSA)",
+      "estado": "parcial"
+    }
+  ]
+};
+
 function initPresetsJSON() {
   const select = document.getElementById("sel-preset-json");
   const txt = document.getElementById("txt-json-payload");
+  if (!select || !txt) return;
 
   const presets = {
+    pipeline_consolidado: PAYLOAD_CONSOLIDADO_FALLBACK,
     unsa_responsable: {
       operacion: "generar_soa",
       perfil: { organizacion: "Universidad Nacional de San Agustín (UNSA)", rol: "responsable" },
@@ -637,18 +760,157 @@ function initPresetsJSON() {
     }
   };
 
-  function cargar() {
-    txt.value = JSON.stringify(presets[select.value], null, 2);
+  select.addEventListener("change", () => {
+    const val = select.value;
+    if (val === "pipeline_consolidado") {
+      activarTarjetaAgente("payload_consolidado_n8n");
+      cargarJsonAgente("payload_consolidado_n8n");
+    } else {
+      desactivarTodasTarjetas();
+      txt.value = JSON.stringify(presets[val], null, 2);
+      const lblAgente = document.getElementById("lbl-inspector-agente");
+      const lblDesc = document.getElementById("lbl-inspector-desc");
+      if (lblAgente) lblAgente.textContent = `Escenario: ${select.options[select.selectedIndex].text}`;
+      if (lblDesc) lblDesc.textContent = "Contrato preparado manualmente según escenario preconfigurado.";
+    }
+  });
+
+  // Carga inicial
+  cargarJsonAgente("payload_consolidado_n8n");
+}
+
+function initSimuladorMAS() {
+  const cards = document.querySelectorAll(".mas-agent-card");
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const agentKey = card.dataset.agent;
+      activarTarjetaAgente(agentKey);
+      cargarJsonAgente(agentKey);
+    });
+  });
+
+  const btnOrquestar = document.getElementById("btn-orquestar-mas-n8n");
+  if (btnOrquestar) {
+    btnOrquestar.addEventListener("click", ejecutarPipelineMASCompleto);
   }
 
-  select.addEventListener("change", cargar);
-  cargar();
+  const btnSimularSoa = document.getElementById("btn-ejecutar-simulacion-soa");
+  if (btnSimularSoa) {
+    btnSimularSoa.addEventListener("click", ejecutarPipelineMASCompleto);
+  }
+
+  const btnCopiar = document.getElementById("btn-copiar-json");
+  if (btnCopiar) {
+    btnCopiar.addEventListener("click", () => {
+      const txt = document.getElementById("txt-json-payload");
+      if (txt) {
+        navigator.clipboard.writeText(txt.value).then(() => {
+          const original = btnCopiar.textContent;
+          btnCopiar.textContent = "✅ ¡Copiado!";
+          setTimeout(() => { btnCopiar.textContent = original; }, 2000);
+        }).catch(() => {
+          alert("No se pudo copiar automáticamente. Por favor use Ctrl+C.");
+        });
+      }
+    });
+  }
+
+  const btnRestaurar = document.getElementById("btn-restaurar-consolidado");
+  if (btnRestaurar) {
+    btnRestaurar.addEventListener("click", () => {
+      activarTarjetaAgente("payload_consolidado_n8n");
+      cargarJsonAgente("payload_consolidado_n8n");
+    });
+  }
+}
+
+function activarTarjetaAgente(agentKey) {
+  const cards = document.querySelectorAll(".mas-agent-card");
+  cards.forEach(c => {
+    if (c.dataset.agent === agentKey) {
+      c.classList.add("active");
+    } else {
+      c.classList.remove("active");
+    }
+  });
+}
+
+function desactivarTodasTarjetas() {
+  document.querySelectorAll(".mas-agent-card").forEach(c => c.classList.remove("active"));
+}
+
+async function cargarJsonAgente(agenteKey) {
+  const meta = METADATA_AGENTES_MAS[agenteKey];
+  if (!meta) return;
+
+  const lblAgente = document.getElementById("lbl-inspector-agente");
+  const lblDesc = document.getElementById("lbl-inspector-desc");
+  const txtArea = document.getElementById("txt-json-payload");
+
+  if (lblAgente) lblAgente.textContent = meta.nombre;
+  if (lblDesc) lblDesc.textContent = meta.desc;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/simulacion/agente/${meta.archivo}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (txtArea) txtArea.value = JSON.stringify(data, null, 2);
+      return;
+    }
+  } catch (err) {
+    // Si falla fetch, usamos fallback
+  }
+
+  if (txtArea) {
+    if (agenteKey === "payload_consolidado_n8n") {
+      txtArea.value = JSON.stringify(PAYLOAD_CONSOLIDADO_FALLBACK, null, 2);
+    } else {
+      txtArea.value = JSON.stringify({
+        simulacion_local: true,
+        agente: meta.nombre,
+        archivo: `knowledge/simulacion_agentes/${meta.archivo}`,
+        nota: "Inicie el servidor Flask (python app.py) para cargar el JSON dinámico completo desde disco."
+      }, null, 2);
+    }
+  }
+}
+
+async function ejecutarPipelineMASCompleto() {
+  activarTarjetaAgente("payload_consolidado_n8n");
+
+  let payload = null;
+  try {
+    const res = await fetch(`${API_BASE}/api/simulacion/agente/payload_consolidado_n8n.json`);
+    if (res.ok) {
+      payload = await res.json();
+    }
+  } catch (e) {}
+
+  if (!payload) {
+    payload = PAYLOAD_CONSOLIDADO_FALLBACK;
+  }
+
+  const txtArea = document.getElementById("txt-json-payload");
+  if (txtArea) {
+    txtArea.value = JSON.stringify(payload, null, 2);
+  }
+
+  const lblAgente = document.getElementById("lbl-inspector-agente");
+  const lblDesc = document.getElementById("lbl-inspector-desc");
+  if (lblAgente) lblAgente.textContent = "🔄 Pipeline n8n Consolidado -> Agente de Controles";
+  if (lblDesc) lblDesc.textContent = "Ejecutando síntesis determinista de SoA con las 5 entradas de agentes.";
+
+  await procesarPayload(payload);
 }
 
 async function procesarJsonDirecto() {
   const txt = document.getElementById("txt-json-payload");
   try {
     const payload = JSON.parse(txt.value);
+    if (!payload.operacion) {
+      alert(`⚠️ El JSON visualizado corresponde a la salida de un agente individual (${payload.agente || payload.agente_emisor || 'Agente upstream'}).\n\nPara ejecutar la evaluación de controles de la UNSA y generar la Declaración de Aplicabilidad (SoA), presione "🔄 Cargar Consolidado n8n" o "🚀 Ejecutar Pipeline MAS Completo".`);
+      return;
+    }
     await procesarPayload(payload);
   } catch (e) {
     alert("El formato JSON ingresado no es válido: " + e.message);
