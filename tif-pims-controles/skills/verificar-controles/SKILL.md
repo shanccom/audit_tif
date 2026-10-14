@@ -1,203 +1,144 @@
 ---
 name: verificar-controles
-version: 2.1.0
-author: Escuela Profesional de Ingeniería de Sistemas - UNSA
-category: auditoria-sistemas-pims
-standard: ISO/IEC 27701:2025 (Harmonized Structure & Anexo A)
 description: >
   Audita el estado de cumplimiento de un control individual del PIMS bajo ISO/IEC 27701:2025
-  para la Universidad Nacional de San Agustín (UNSA). Evalúa su aplicabilidad, verifica
-  la validez de sus evidencias documentales, asocia la política institucional mediante RAG (FAISS)
-  y genera una prescripción técnica accionable dirigida al agente especializado correspondiente.
-tools:
-  - engine_regla_aplicabilidad
-  - engine_regla_estado_probatorio
-  - faiss_rag_politicas_retriever
-  - prescriptive_recommender
+  para la UNSA. Evalúa su aplicabilidad por rol, verifica sus evidencias documentales,
+  asocia la política institucional y emite una prescripción técnica accionable.
+  Úsalo cuando el usuario pida: "verifica el control A.X.X.X", "¿está implementado el control de DPIA?",
+  "audita el control de respuesta a incidentes", "¿qué falta para cumplir con A.3.11?",
+  "revisa si tenemos evidencia para el control de registros de tratamiento".
+metadata:
+  author: Escuela Profesional de Ingeniería de Sistemas - UNSA
+  version: 2.1.0
+  standard: ISO/IEC 27701:2025 - Cláusulas 6.1.3, 9.1, 9.2 y Anexo A
+  scope: Auditoría granular de controles PIMS - UNSA
 ---
 
-# SKILL-02: Verificación y Auditoría Puntual de Controles
+# Verificar y Auditar Controles PIMS
 
-## 1. Identidad y Ficha Metodológica
-- **Identificador Único:** `SKILL-PIMS-CONTROLES-002`
-- **Nombre:** `verificar-controles`
-- **Paradigma:** Diagnóstico determinista puntual y emisión de prescripciones técnicas.
-- **Alcance Institucional:** Auditoría granular sobre sistemas universitarios (ej. control `A.1.2.6` DPIA en Comedor Universitario o `A.3.12` respuesta a incidentes en OTIC-UNSA).
-- **Marco Normativo:** Cláusulas 6.1.3, 9.1 (Seguimiento y Medición), 9.2 (Auditoría Interna) y Anexo A de ISO/IEC 27701:2025.
+## Instructions
 
----
+### Step 1: Identificar el control a auditar
 
-## 2. Condiciones de Activación (Triggers)
+Extrae el identificador del control del mensaje del usuario (formato `A.X.X.X`, ej. `A.1.2.6`).
 
-### Activación Automática / Vía Orquestador:
-- Solicitud de verificación sobre un control específico desde **n8n** o mesa de trabajo del auditor.
-- Inspección preliminar de controles de alto riesgo antes de auditorías de certificación externa.
-- Re-evaluación rápida de un control tras el envío de una nueva evidencia por parte del *Agente de Evidencia*.
+- Busca el control en `knowledge/catalogo_controles.json`
+- Si el control **no existe** en el catálogo → responde con error:
+  *"El control '[ID]' no está registrado en el catálogo de controles PIMS de la UNSA."*
+  No continúes.
+- Si el control **existe** → obtén su `nombre` y `agente_responsable` para usarlos en los pasos siguientes.
 
-### Cuándo NO se activa:
-- Solicitudes de elaboración, actualización global o consolidación de la SoA completa (usar `generar-soa`).
+### Step 2: Confirmar el rol organizacional
 
----
+Determina el rol PIMS de la organización (igual que en la skill `generar-soa`):
 
-## 3. Especificación del Contrato de Entrada (Input Schema)
+- `responsable` → controles A.1 y A.3 aplican
+- `encargado` → controles A.2 y A.3 aplican
+- `ambos` → todos los controles aplican
 
-```json
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "VerificarControlInput",
-  "type": "object",
-  "required": ["operacion", "control", "perfil"],
-  "properties": {
-    "operacion": {
-      "type": "string",
-      "enum": ["verificar_control"]
-    },
-    "control": {
-      "type": "string",
-      "description": "Identificador normativo exacto del control del Anexo A.",
-      "example": "A.1.2.6"
-    },
-    "perfil": {
-      "type": "object",
-      "required": ["rol"],
-      "properties": {
-        "organizacion": { "type": "string", "default": "Universidad Nacional de San Agustín (UNSA)" },
-        "rol": { "type": "string", "enum": ["responsable", "encargado", "ambos"] }
-      }
-    },
-    "riesgos": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "controles"],
-        "properties": {
-          "id": { "type": "string" },
-          "descripcion": { "type": "string" },
-          "controles": { "type": "array", "items": { "type": "string" } }
-        }
-      }
-    },
-    "evidencias": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["control", "descripcion", "estado"],
-        "properties": {
-          "control": { "type": "string" },
-          "descripcion": { "type": "string" },
-          "estado": { "type": "string", "enum": ["implementado", "parcial"] }
-        }
-      }
-    }
-  }
-}
-```
+Si el rol no está claro en el mensaje, pregunta: *"¿La UNSA actúa como responsable, encargada o en ambos roles para este sistema?"*
 
----
+### Step 3: Evaluar la aplicabilidad del control
 
-## 4. Procedimiento Operativo Estándar (Algoritmo de Diagnóstico)
+Aplica la regla de prefijo:
 
-```
-[Paso 1: Validación de Integridad]
-  ├── Validar que control_id exista en catalogo_controles.json.
-  │     └── Si no existe: Abortar con estado="rechazada" ("Control no reconocido en catálogo").
-  └── Validar que perfil.rol ∈ {"responsable", "encargado", "ambos"}.
-[Paso 2: Evaluación de Aplicabilidad]
-  └── Aplicar regla: A.1 (Responsable), A.2 (Encargado), A.3 (Universal).
-[Paso 3: Búsqueda y Filtrado de Evidencias Propias]
-  └── Filtrar Evidencias(control_id).
-[Paso 4: Determinación de Estado Probatorio]
-  ├── Si Aplica == False ➔ estado = "no aplica".
-  ├── Si hay al menos un artefacto "implementado" ➔ estado = "implementado".
-  ├── Si hay al menos un artefacto "parcial" ➔ estado = "parcial".
-  └── Si no hay artefactos ➔ estado = "no implementado".
-[Paso 5: Vinculación Semántica con Directiva UNSA (RAG)]
-  └── Búsqueda vectorial FAISS con control.nombre (Umbral θ = 0.30).
-[Paso 6: Emisión de Prescripción y Recomendación Técnica]
-  ├── Si "no aplica" ➔ "Documentar formalmente el motivo de exclusión en la SoA institucional."
-  ├── Si "implementado" ➔ "Control operativo. Mantener la evidencia vigente para la auditoría interna (Cláusula 9.2)."
-  ├── Si "parcial" ➔ "Completar los requisitos pendientes del control con el " + control.agente_responsable + "."
-  └── Si "no implementado" ➔ "Solicitar formalmente la implementación y evidencia documental al " + control.agente_responsable + "."
-[Paso 7: Empaquetado en Contrato Estándar]
-  └── Emitir respuesta JSON con requiere_revision_humana = True.
-```
+| Prefijo del control | Aplica si rol es... |
+|---|---|
+| `A.1` | `responsable` o `ambos` |
+| `A.2` | `encargado` o `ambos` |
+| `A.3` | Siempre (universal) |
+
+- Si **no aplica**: ve directamente al Step 6 con estado `"no aplica"`.
+- Si **aplica**: continúa al Step 4.
+
+### Step 4: Verificar evidencias disponibles
+
+Filtra del array `evidencias` del input solo las que corresponden al control auditado (campo `control == ID`).
+
+Determina el estado probatorio:
+
+| Evidencias encontradas | Estado |
+|---|---|
+| Al menos una con `estado: "implementado"` | `implementado` |
+| Al menos una con `estado: "parcial"` | `parcial` |
+| Sin evidencias para este control | `no implementado` |
+
+> **Regla de oro:** La ausencia de evidencia implica `no implementado`. No inferir cumplimiento por conocimiento previo ni razonamiento generativo.
+
+### Step 5: Asociar política institucional (RAG)
+
+Realiza una búsqueda semántica FAISS sobre `knowledge/politicas/` usando el **nombre del control** como query.
+
+- Score `>= 0.30` → registrar como `politica_relacionada: "[nombre de la política]"`
+- Score `< 0.30` → `politica_relacionada: null` (registrar `WARN_POLITICA_BAJA_SIMILITUD` en log, no detener flujo)
+
+### Step 6: Generar la prescripción técnica
+
+Emite una recomendación accionable según el estado determinado:
+
+| Estado del control | Prescripción |
+|---|---|
+| `no aplica` | *"Documentar formalmente la exclusión y su justificación en la SoA institucional."* |
+| `implementado` | *"Control operativo. Mantener la evidencia vigente para la auditoría interna (Cláusula 9.2 de ISO/IEC 27701:2025)."* |
+| `parcial` | *"Completar los requisitos pendientes del control coordinando con el [agente_responsable]."* |
+| `no implementado` | *"Solicitar formalmente la implementación y evidencia documental al [agente_responsable]."* |
+
+### Step 7: Emitir la respuesta final
+
+Presenta el resultado con:
+
+- `control`: ID del control auditado
+- `nombre`: nombre del control
+- `aplica`: true/false
+- `justificacion`: motivo de aplicabilidad o exclusión (con riesgos vinculados si los hay)
+- `estado`: estado probatorio determinado
+- `evidencias`: lista de descripciones de las evidencias encontradas
+- `politica_relacionada`: política UNSA asociada o null
+- `responsable`: agente responsable del catálogo
+- `recomendacion`: prescripción técnica accionable (del Step 6)
+- `requiere_revision_humana: true` (invariante, no modificar)
 
 ---
 
-## 5. Especificación del Contrato de Salida (Output Schema)
+## Examples
 
-```json
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "VerificarControlOutput",
-  "type": "object",
-  "required": ["agente", "operacion", "estado", "respuesta", "datos", "requiere_revision_humana"],
-  "properties": {
-    "agente": { "type": "string", "const": "controles" },
-    "operacion": { "type": "string", "const": "verificar_control" },
-    "estado": { "type": "string", "enum": ["ok", "rechazada"] },
-    "respuesta": { "type": "string" },
-    "datos": {
-      "type": "object",
-      "required": ["control", "nombre", "aplica", "justificacion", "estado", "responsable", "recomendacion"],
-      "properties": {
-        "control": { "type": "string", "example": "A.1.2.6" },
-        "nombre": { "type": "string", "example": "Evaluación de impacto de privacidad (DPIA)" },
-        "aplica": { "type": "boolean", "example": true },
-        "justificacion": { "type": "string" },
-        "estado": { "type": "string", "enum": ["implementado", "parcial", "no implementado", "no aplica"] },
-        "evidencias": { "type": "array", "items": { "type": "string" } },
-        "politica_relacionada": { "type": ["string", "null"] },
-        "responsable": { "type": "string", "example": "Agente de Riesgos" },
-        "recomendacion": { "type": "string", "example": "Solicitar evidencia o implementación al Agente de Riesgos." }
-      }
-    },
-    "fuentes": { "type": "array", "items": { "type": "string" } },
-    "confianza": { "type": "number", "const": 1.0 },
-    "requiere_revision_humana": { "type": "boolean", "const": true }
-  }
-}
-```
+**User says:** *"Verifica el control A.1.2.6 para la UNSA como responsable. Tenemos un borrador de DPIA."*
+
+**Actions:**
+1. Buscar `A.1.2.6` en catálogo → encontrado: *"Evaluación de impacto de privacidad (DPIA)"*, agente: *"Agente de Riesgos"*
+2. Rol = `responsable` → prefijo `A.1` → **aplica**
+3. Buscar evidencias con `control: "A.1.2.6"` → encontrada 1 evidencia con `estado: "parcial"`
+4. Estado probatorio = `parcial`
+5. Buscar política FAISS → match con *"POL-UNSA-03. Evaluación de Impacto en la Privacidad (DPIA)"*
+6. Prescripción: *"Completar los requisitos pendientes del control coordinando con el Agente de Riesgos."*
+7. Emitir respuesta con `requiere_revision_humana: true`
 
 ---
 
-## 6. Caso de Uso Canónico (UNSA: Auditoría de DPIA en Comedor)
+**User says:** *"¿Está implementado el control A.2.5.7 si la UNSA solo actúa como responsable?"*
 
-### Solicitud de Entrada:
-```json
-{
-  "operacion": "verificar_control",
-  "control": "A.1.2.6",
-  "perfil": { "organizacion": "UNSA", "rol": "responsable" },
-  "riesgos": [
-    { "id": "R-UNSA-02", "descripcion": "Tratamiento de biometría en Comedor Universitario", "controles": ["A.1.2.6"] }
-  ],
-  "evidencias": [
-    { "control": "A.1.2.6", "descripcion": "[Doc: DPIA-Biometria-Borrador.docx] Avance preliminar", "estado": "parcial" }
-  ]
-}
-```
+**Actions:**
+1. Buscar `A.2.5.7` en catálogo → encontrado: *"Divulgación de subcontratistas"*
+2. Rol = `responsable` → prefijo `A.2` → **NO aplica**
+3. Estado = `no aplica`
+4. Prescripción: *"Documentar formalmente la exclusión y su justificación en la SoA institucional."*
+5. Emitir respuesta indicando que el control está excluido por rol, con justificación formal
 
-### Respuesta Emitida:
-```json
-{
-  "agente": "controles",
-  "operacion": "verificar_control",
-  "estado": "ok",
-  "respuesta": "Control A.1.2.6: parcial. Recomendación: Completar la implementación con el Agente de Riesgos.",
-  "datos": {
-    "control": "A.1.2.6",
-    "nombre": "Evaluación de impacto de privacidad (DPIA)",
-    "aplica": true,
-    "justificacion": "La organización actúa como responsable del tratamiento. Vinculado a los riesgos: R-UNSA-02.",
-    "estado": "parcial",
-    "evidencias": ["[Doc: DPIA-Biometria-Borrador.docx] Avance preliminar"],
-    "politica_relacionada": "POL-UNSA-03. Evaluación de Impacto en la Privacidad (DPIA) para Sistemas Críticos y Biometría",
-    "responsable": "Agente de Riesgos",
-    "recomendacion": "Completar la implementación con el Agente de Riesgos."
-  },
-  "fuentes": ["catalogo_controles.json"],
-  "confianza": 1.0,
-  "requiere_revision_humana": true
-}
-```
+---
+
+## Troubleshooting
+
+* **Error:** El ID del control no existe en el catálogo.
+  **Solution:** Responder con `estado: "rechazada"` y mensaje: *"El control '[ID]' no está registrado en el catálogo de controles PIMS de la UNSA. Verifica el identificador según el Anexo A de ISO/IEC 27701:2025."* No continuar.
+
+* **Error:** No se proporcionó el rol organizacional.
+  **Solution:** Preguntar antes de continuar: *"¿La UNSA actúa como responsable del tratamiento, como encargada, o en ambos roles para el sistema en auditoría?"*
+
+* **Error:** El usuario quiere que el control se marque como implementado sin evidencia documental.
+  **Solution:** Aplicar el principio de verificación probatoria: *"Un control solo puede ser calificado como implementado si existe al menos un artefacto probatorio registrado. Sin evidencia objetiva, el estado es no implementado (ISO/IEC 27701:2025, Cláusula 9.1)."*
+
+* **Error:** Se solicita verificar un control para toda la SoA en lugar de uno puntual.
+  **Solution:** Redirigir al skill correcto: *"Para auditar todos los controles del PIMS y generar la SoA completa, utiliza la skill `generar-soa`."*
+
+* **Error:** No se encontró política relacionada (score FAISS < 0.30).
+  **Solution:** Asignar `politica_relacionada: null`, registrar `WARN_POLITICA_BAJA_SIMILITUD` y continuar. No interrumpir la auditoría.
