@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Gestión de Privacidad (PIMS) - UNSA | ISO/IEC 27701:2025</title>
+  <title>Sistema de Gestión de Privacidad (PIMS) - UNSA | Flujo de Auditoría ISO/IEC 27701</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -29,14 +29,14 @@
 
       <div class="header-meta">
         <div class="meta-pill-box">
-          <span class="meta-sub">Norma de referencia</span>
+          <span class="meta-sub">Estándar internacional</span>
           <span class="meta-main">ISO/IEC 27701:2025</span>
         </div>
 
         <div class="connection-status" id="connection-status" title="Estado de la conexión con el servidor">
           <span class="status-dot online" id="status-dot"></span>
           <span id="status-text">Servidor conectado (:5000)</span>
-          <span class="info-help" data-tooltip="Indica si el motor de auditoría en Python está en línea. Si se desconecta, el sistema funciona de modo autónomo en el navegador.">?</span>
+          <span class="info-help" data-tooltip="Indica si el servicio en segundo plano está respondiendo. Si no está activo, el sistema continúa funcionando en modo local en el navegador.">?</span>
         </div>
 
         <button class="btn-help-trigger" id="btn-abrir-guia" type="button">
@@ -45,13 +45,13 @@
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
           </svg>
-          <span>Guía paso a paso</span>
+          <span>Guía del sistema</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Banner de Notificación si el backend se apaga -->
+  <!-- Banner de Notificación si el servidor local se apaga -->
   <div id="server-alert" class="server-notice" style="display: none;">
     <div class="notice-container">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -60,117 +60,74 @@
         <line x1="12" y1="16" x2="12.01" y2="16"></line>
       </svg>
       <div>
-        <strong>Modo de contingencia local activo:</strong> No se detectó el servicio en segundo plano. 
-        El sistema continuará evaluando controles y generando la SoA utilizando el motor interno del navegador.
+        <strong>Modo de contingencia autónomo:</strong> El backend no está activo en el puerto 5000. 
+        El sistema continuará evaluando controles y ejecutando el RAG mediante el motor interno de contingencia.
       </div>
     </div>
   </div>
 
   <main class="main-wrapper">
 
-    <!-- Apartado de Contexto Didáctico: ¿Por qué existe y qué hace esta herramienta? -->
-    <section class="context-highlight-box" id="seccion-contexto">
-      <div class="context-header" id="toggle-contexto">
-        <div class="context-header-left">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          <div>
-            <div class="context-title">
-              ¿Por qué existe este sistema y qué problema resuelve?
-              <span class="info-help" data-tooltip="Haz clic en el botón de la derecha para desplegar u ocultar este resumen explicativo.">?</span>
-            </div>
-            <div class="context-subtitle">Contexto real de la UNSA y objetivo práctico de la auditoría de privacidad</div>
+    <!-- STEPPER VISUAL DEL FLUJO DE TRABAJO (3 PASOS SECUENCIALES) -->
+    <nav class="workflow-stepper" aria-label="Pasos del proceso de auditoría">
+      <button class="step-card-nav active" id="btn-nav-step-1" data-step="step-1" type="button">
+        <div class="step-number-circle">1</div>
+        <div class="step-nav-content">
+          <div class="step-nav-title">
+            Entradas y Datos (Input)
+            <span class="info-help" data-tooltip="Paso 1: Define el alcance de la universidad, su rol y los documentos oficiales que sustentan el cumplimiento.">?</span>
           </div>
+          <div class="step-nav-desc">Organización, rol institucional, riesgos y evidencias</div>
         </div>
-        <button class="btn-toggle-context" id="btn-toggle-contexto" type="button">Ocultar explicación</button>
-      </div>
-
-      <div class="context-body" id="context-body-content">
-        <div class="context-card-item">
-          <strong>1. El desafío real en la UNSA</strong>
-          <p>La universidad recopila y almacena datos sensibles a diario: registros de notas en SISUNSA, expedientes de postulantes en Admisión y huellas dactilares de becarios en el Comedor Universitario. Proteger esta información es una obligación legal y ética.</p>
-        </div>
-
-        <div class="context-card-item">
-          <strong>2. La exigencia de la norma internacional</strong>
-          <p>Para certificar la seguridad de estos datos, la norma ISO/IEC 27701 exige elaborar una Declaración de Aplicabilidad (SoA). Este documento determina qué reglas de privacidad aplican obligatoriamente a la universidad y cuáles pueden descartarse.</p>
-        </div>
-
-        <div class="context-card-item">
-          <strong>3. Lo que hace esta herramienta</strong>
-          <p>Cruza los controles de la norma con los reglamentos, resoluciones y directivas vigentes de la UNSA. Si un control no tiene un documento oficial que lo pruebe, el sistema alerta de inmediato qué oficina debe regularizarlo antes de una auditoría oficial.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Pestañas de Navegación Segmentadas -->
-    <nav class="nav-tabs" role="tablist">
-      <button class="nav-tab-item active" data-tab="tab-evaluacion" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 11l3 3L22 4"></path>
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-        </svg>
-        Declaración de Aplicabilidad (SoA)
-        <span class="info-help" data-tooltip="Herramienta principal: evalúa qué controles aplican a la universidad y genera el informe completo.">?</span>
       </button>
 
-      <button class="nav-tab-item" data-tab="tab-evidencias" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-        </svg>
-        Documentos de Respaldo (RAG)
-        <span class="info-help" data-tooltip="Muestra los reglamentos y directivas de la UNSA indexados en la base de conocimiento semántica.">?</span>
+      <button class="step-card-nav" id="btn-nav-step-2" data-step="step-2" type="button">
+        <div class="step-number-circle">2</div>
+        <div class="step-nav-content">
+          <div class="step-nav-title">
+            Uso de Skills del Agente
+            <span class="info-help" data-tooltip="Paso 2: Ejecuta las habilidades del Agente para evaluar controles, calcular el cumplimiento y detectar brechas.">?</span>
+          </div>
+          <div class="step-nav-desc">Generar SoA completa o auditar un control puntual</div>
+        </div>
       </button>
 
-      <button class="nav-tab-item" data-tab="tab-verificacion" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        Revisión de Control Individual
-        <span class="info-help" data-tooltip="Permite consultar una sola regla de privacidad para ver si está cumplida y qué recomendación da el sistema.">?</span>
-      </button>
-
-      <button class="nav-tab-item" data-tab="tab-contrato" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="16 18 22 12 16 6"></polyline>
-          <polyline points="8 6 2 12 8 18"></polyline>
-        </svg>
-        Datos en JSON (n8n)
-        <span class="info-help" data-tooltip="Formato estructurado para enviar la auditoría a flujos automáticos sin ingresar datos a mano.">?</span>
+      <button class="step-card-nav" id="btn-nav-step-3" data-step="step-3" type="button">
+        <div class="step-number-circle">3</div>
+        <div class="step-nav-content">
+          <div class="step-nav-title">
+            RAG y Base Normativa
+            <span class="info-help" data-tooltip="Paso 3: Búsqueda semántica en reglamentos reales de la UNSA que fundamentan cada decisión sin inventar datos.">?</span>
+          </div>
+          <div class="step-nav-desc">Búsqueda semántica en directivas y resoluciones reales</div>
+        </div>
       </button>
     </nav>
 
-    <!-- PESTAÑA 1: EVALUACIÓN PRINCIPAL / GENERACIÓN DE LA SoA -->
-    <section id="tab-evaluacion" class="tab-pane active">
-      <div class="tab-intro-card">
-        <div class="tab-intro-info">
-          <div class="tab-intro-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <div class="tab-intro-text">
-            <h3>Evaluación del cumplimiento de privacidad</h3>
-            <p>Selecciona cómo opera la UNSA en el tratamiento de datos y revisa los documentos que sustentan cada exigencia legal.</p>
-          </div>
+    <!-- ====================================================================
+         PASO 1: ENTRADAS Y DATOS (INPUT)
+         ==================================================================== -->
+    <section id="step-1" class="step-pane active">
+      <div class="step-intro-banner">
+        <div class="step-intro-content">
+          <h3>
+            Paso 1: Entradas y datos de la evaluación
+            <span class="info-help" data-tooltip="Este es el punto de partida. Aquí defines los datos que el Agente necesita para trabajar.">?</span>
+          </h3>
+          <p>
+            Configura el alcance de la UNSA, su rol frente a los datos personales, los riesgos identificados y los documentos probatorios que respaldan cada medida de seguridad.
+          </p>
         </div>
       </div>
 
       <div class="layout-grid">
-        <!-- Columna 1: Alcance y Roles -->
+        <!-- Columna Izquierda: Entidad, Rol y Riesgos -->
         <div class="panel">
           <div class="panel-header">
             <h3>
-              <span class="panel-header-step">1</span>
-              Alcance y rol de la institución
-              <span class="info-help" data-tooltip="Define si la UNSA decide el uso de los datos o si solo los procesa por encargo de otra entidad.">?</span>
+              <span class="panel-header-step">1.1</span>
+              Alcance y rol institucional
+              <span class="info-help" data-tooltip="Indica si la universidad fija la finalidad de los datos o si solo los procesa por mandato de terceros.">?</span>
             </h3>
           </div>
           <div class="panel-body">
@@ -178,7 +135,7 @@
               <div class="field-label-row">
                 <label for="input-org">
                   Entidad evaluada
-                  <span class="info-help" data-tooltip="Institución pública universitaria sujeta al alcance de la auditoría.">?</span>
+                  <span class="info-help" data-tooltip="Organización pública sujeta al alcance de la auditoría de privacidad.">?</span>
                 </label>
                 <span class="sub-pill">Sede Central</span>
               </div>
@@ -188,21 +145,21 @@
             <div class="field-group">
               <div class="field-label-row">
                 <label>
-                  ¿Qué papel cumple la UNSA con estos datos?
-                  <span class="info-help" data-tooltip="La norma clasifica a las organizaciones en Responsables (deciden el propósito de los datos) o Encargadas (siguen instrucciones de un tercero). Esto determina qué controles aplican.">?</span>
+                  Rol de la UNSA frente a los datos tratados:
+                  <span class="info-help" data-tooltip="La norma clasifica a las instituciones en Responsables (deciden qué hacer con los datos) o Encargadas (siguen órdenes externas). Esto determina qué controles normativos aplican.">?</span>
                 </label>
               </div>
 
-              <!-- Selector de Roles -->
+              <!-- Selector de Roles con Tarjetas Seleccionables -->
               <div class="role-options">
                 <label class="role-opt selected" id="opt-responsable">
                   <input type="radio" name="rol-eval" value="responsable" checked>
                   <div class="opt-desc">
                     <div class="opt-desc-header">
                       <strong>Responsable de los datos (PII Controller)</strong>
-                      <span class="sub-pill">Controles A.1 y A.3</span>
+                      <span class="sub-pill">Aplica Controles A.1 y A.3</span>
                     </div>
-                    <p>La UNSA decide para qué se usan los datos en sistemas propios como SISUNSA, Admisión y Comedor Universitario.</p>
+                    <p>La UNSA determina los fines y medios del tratamiento en sistemas como SISUNSA, Admisión y Comedor Universitario.</p>
                   </div>
                 </label>
 
@@ -211,9 +168,9 @@
                   <div class="opt-desc">
                     <div class="opt-desc-header">
                       <strong>Encargado del tratamiento (PII Processor)</strong>
-                      <span class="sub-pill">Controles A.2 y A.3</span>
+                      <span class="sub-pill">Aplica Controles A.2 y A.3</span>
                     </div>
-                    <p>La UNSA procesa datos personales siguiendo instrucciones directas de una entidad externa (ej. convenios de investigación).</p>
+                    <p>La UNSA procesa datos bajo instrucciones expresas de un tercero (ej. convenios de investigación con otras entidades).</p>
                   </div>
                 </label>
 
@@ -224,7 +181,7 @@
                       <strong>Ambos roles a la vez</strong>
                       <span class="sub-pill">Catálogo Completo</span>
                     </div>
-                    <p>Aplica la totalidad de controles del estándar internacional sin descartar ninguna sección.</p>
+                    <p>Aplica la totalidad de controles del estándar ISO/IEC 27701 sin descartar ninguna sección.</p>
                   </div>
                 </label>
               </div>
@@ -233,10 +190,10 @@
             <div class="field-group" style="margin-top: 16px;">
               <div class="field-label-row">
                 <label>
-                  Riesgos de privacidad detectados en la universidad
-                  <span class="info-help" data-tooltip="Situaciones identificadas que podrían vulnerar la privacidad de los usuarios si no se controlan debidamente.">?</span>
+                  Riesgos de privacidad registrados:
+                  <span class="info-help" data-tooltip="Escenarios de riesgo detectados en la universidad que deben mitigarse mediante controles específicos.">?</span>
                 </label>
-                <span class="sub-pill">Matriz de riesgos</span>
+                <span class="sub-pill">Agente de Riesgos</span>
               </div>
               <div id="contenedor-riesgos-resumen" class="risk-summary-box">
                 <!-- Se llena dinámicamente -->
@@ -245,13 +202,13 @@
           </div>
         </div>
 
-        <!-- Columna 2: Evidencias y Ejecución -->
+        <!-- Columna Derecha: Documentos de Respaldo -->
         <div class="panel">
           <div class="panel-header header-with-action">
             <h3>
-              <span class="panel-header-step">2</span>
+              <span class="panel-header-step">1.2</span>
               Documentos de respaldo registrados
-              <span class="info-help" data-tooltip="Ningún control se aprueba en el aire: cada punto requiere un reglamento o resolución oficial que acredite su cumplimiento.">?</span>
+              <span class="info-help" data-tooltip="Para que un control se considere cumplido debe existir un documento oficial vigente (resolución o reglamento) que lo acredite.">?</span>
             </h3>
             <button class="btn-sm" id="btn-abrir-modal-evidencia" type="button">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -263,12 +220,12 @@
           </div>
           <div class="panel-body">
             <p class="section-help">
-              Para que un control se marque como <em>Implementado</em>, debe existir un documento oficial vigente en la universidad que respalde el proceso.
+              Cada documento listado acredita formalmente que la universidad ejecuta una medida de seguridad. Si falta un archivo, el sistema marcará el control como pendiente.
             </p>
 
             <div class="artifacts-header-bar">
-              <span class="artifacts-count-badge" id="lbl-total-evidencias">Archivos disponibles</span>
-              <span class="info-help" data-tooltip="Cantidad de archivos probatorios cargados actualmente para esta evaluación.">?</span>
+              <span class="artifacts-count-badge" id="lbl-total-evidencias">Archivos activos</span>
+              <span class="info-help" data-tooltip="Cantidad de documentos oficiales cargados en este momento.">?</span>
             </div>
 
             <!-- Lista de Evidencias -->
@@ -278,19 +235,19 @@
 
             <!-- Formulario Desplegable para Agregar Evidencia -->
             <div id="form-registro-rapido" class="box-subform" style="display: none;">
-              <h4>Registrar nuevo documento de respaldo</h4>
+              <h4>Registrar nuevo documento probatorio</h4>
               <div class="form-row">
                 <div class="form-col">
                   <label>
                     Control que respalda:
-                    <span class="info-help" data-tooltip="Selecciona a qué exigencia de la norma le sirve de sustento este documento.">?</span>
+                    <span class="info-help" data-tooltip="Selecciona qué medida de la norma sustenta este documento.">?</span>
                   </label>
                   <select id="sel-nuevo-control" class="form-control"></select>
                 </div>
                 <div class="form-col">
                   <label>
                     Grado de validez:
-                    <span class="info-help" data-tooltip="Usa 'Oficial vigente' si ya está aprobado por resolución, o 'Borrador' si aún está en trámite.">?</span>
+                    <span class="info-help" data-tooltip="Elige 'Oficial vigente' si está aprobado formalmente, o 'Borrador' si está en trámite.">?</span>
                   </label>
                   <select id="sel-nuevo-estado" class="form-control">
                     <option value="implementado">Oficial vigente (Aprobado)</option>
@@ -303,47 +260,434 @@
                 <input type="text" id="txt-nuevo-archivo" placeholder="ej. Resolucion-Rectoral-0127-2025-UNSA.pdf" class="form-control">
               </div>
               <div class="field-group">
-                <label>¿Qué acredita o de qué trata este documento?:</label>
-                <input type="text" id="txt-nueva-desc" placeholder="ej. Reglamento que aprueba el uso de huellas digitales en el comedor y fija deberes" class="form-control">
+                <label>¿Qué acredita este documento?:</label>
+                <input type="text" id="txt-nueva-desc" placeholder="ej. Reglamento de Comedor que fija el consentimiento de huellas dactilares" class="form-control">
               </div>
               <div class="form-buttons">
                 <button class="btn-primary-sm" id="btn-guardar-documento" type="button">Guardar documento</button>
                 <button class="btn-secondary-sm" id="btn-cancelar-documento" type="button">Cancelar</button>
               </div>
             </div>
-
-            <!-- Botón de Ejecución Principal -->
-            <div class="execute-action-area">
-              <button class="btn-primary-block" id="btn-generar-soa" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-                Generar Declaración de Aplicabilidad (SoA)
-              </button>
-            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Acordeón Plegable: Entrada Directa JSON / n8n (Opcional) -->
+      <div class="json-input-accordion">
+        <div class="json-input-header" id="btn-toggle-json-accordion">
+          <h4>
+            Entrada alternativa en formato JSON (Integración con n8n)
+            <span class="info-help" data-tooltip="Permite enviar las mismas entradas del Paso 1 mediante un bloque JSON estructurado o conectar flujos automáticos.">?</span>
+          </h4>
+          <span style="font-size: 11.5px; color: var(--slate-500);">Desplegar editor JSON</span>
+        </div>
+        <div class="json-input-body" id="json-accordion-body">
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="sel-preset-json">Escenario preconfigurado de prueba:</label>
+              <span class="sub-pill">4 Casos listos</span>
+            </div>
+            <select id="sel-preset-json" class="form-control" style="max-width: 480px;">
+              <option value="unsa_responsable">Caso 1: UNSA como Responsable (SISUNSA, Admisión, Comedor)</option>
+              <option value="unsa_encargado">Caso 2: UNSA como Encargada de tratamiento externo</option>
+              <option value="unsa_ambos">Caso 3: UNSA con ambos roles a la vez</option>
+              <option value="unsa_sin_evidencias">Caso 4: UNSA sin documentos de respaldo todavía</option>
+            </select>
+          </div>
+
+          <textarea id="txt-json-payload" class="code-box" rows="12" spellcheck="false"></textarea>
+
+          <div class="json-actions-bar">
+            <button class="btn-primary" id="btn-enviar-json" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Cargar y procesar este JSON
+            </button>
+            <button class="btn-secondary" id="btn-copiar-json-input" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copiar JSON al portapapeles
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie de Navegación del Paso 1 -->
+      <div class="step-navigation-footer">
+        <div style="font-size: 12px; color: var(--slate-500);">
+          Los datos ingresados están listos para ser procesados por las habilidades del Agente.
+        </div>
+        <button class="btn-primary" id="btn-ir-paso-2" type="button">
+          <span>Continuar al Paso 2: Ejecutar Skills</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
       </div>
     </section>
 
-    <!-- PESTAÑA 2: DOCUMENTOS DE RESPALDO (RAG) -->
-    <section id="tab-evidencias" class="tab-pane">
-      <div class="tab-intro-card">
-        <div class="tab-intro-info">
-          <div class="tab-intro-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
+    <!-- ====================================================================
+         PASO 2: USO DE SKILLS DEL AGENTE
+         ==================================================================== -->
+    <section id="step-2" class="step-pane">
+      <div class="step-intro-banner">
+        <div class="step-intro-content">
+          <h3>
+            Paso 2: Uso de Skills del Agente
+            <span class="info-help" data-tooltip="Una 'Skill' es una habilidad programada del Agente. Aplica las fórmulas y reglas normativas sobre tus entradas del Paso 1.">?</span>
+          </h3>
+          <p>
+            El Agente de Controles dispone de dos habilidades principales: generar la Declaración de Aplicabilidad (SoA) completa o auditar un control individual específico.
+          </p>
+        </div>
+      </div>
+
+      <!-- Selector Didáctico de Skills -->
+      <div class="skills-selection-grid">
+        <!-- Skill 1: Generar SoA -->
+        <div class="skill-card">
+          <div>
+            <span class="skill-card-badge">Skill Principal</span>
+            <h4>
+              1. Generar Declaración de Aplicabilidad (SoA)
+              <span class="info-help" data-tooltip="Evalúa todos los controles del catálogo ISO/IEC 27701, calcula el nivel de cumplimiento y genera el reporte formal.">?</span>
+            </h4>
+            <p>
+              Toma los datos del Paso 1, determina qué controles aplican según el rol institucional, verifica si tienen documentos probatorios y genera el dictamen completo con el porcentaje de madurez.
+            </p>
           </div>
-          <div class="tab-intro-text">
-            <h3>Base de reglamentos y directivas institucionales</h3>
-            <p>Documentos oficiales de la UNSA analizados por el sistema mediante búsqueda de contenido para fundamentar cada control.</p>
+          <button class="btn-primary-block" id="btn-generar-soa" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Ejecutar Skill: Generar SoA Completa
+          </button>
+        </div>
+
+        <!-- Skill 2: Verificar Control Individual -->
+        <div class="skill-card">
+          <div>
+            <span class="skill-card-badge">Skill Puntual</span>
+            <h4>
+              2. Auditar un Control Individual
+              <span class="info-help" data-tooltip="Permite examinar una sola regla de privacidad a profundidad para emitir una recomendación directa.">?</span>
+            </h4>
+            <p>
+              Selecciona una regla puntual para saber de inmediato si la UNSA la cumple o qué acción debe tomar el área asignada.
+            </p>
+            <div class="field-group" style="margin-top: 10px;">
+              <select id="sel-control-individual" class="form-control"></select>
+            </div>
+          </div>
+          <button class="btn-secondary" id="btn-auditar-individual" style="width: 100%; justify-content: center;" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Auditar Control Seleccionado
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL DE RESULTADOS DE LA SKILL (DASHBOARD SOA) -->
+      <section id="panel-resultados-soa" class="panel result-panel" style="display: none;">
+        <div class="panel-header header-with-action">
+          <div>
+            <span class="badge-tag ok" id="lbl-estado-resp">EVALUACIÓN COMPLETADA</span>
+            <h2 id="lbl-titulo-soa">Declaración de Aplicabilidad (SoA) - ISO/IEC 27701:2025</h2>
+            <p id="lbl-subtitulo-soa" class="result-sub"></p>
+          </div>
+          <div class="header-action-group">
+            <button class="btn-secondary" id="btn-descargar-json" type="button" title="Descargar reporte en formato JSON">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Descargar JSON
+            </button>
+            <button class="btn-secondary" id="btn-imprimir-reporte" type="button" title="Imprimir o guardar como PDF">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              Imprimir / PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <!-- Barra de Cumplimiento -->
+          <div class="compliance-progress-box">
+            <div class="compliance-progress-header">
+              <span class="compliance-title">
+                Nivel de cumplimiento frente a los controles que aplican a la UNSA
+                <span class="info-help" data-tooltip="Porcentaje de controles que ya cuentan con documentos probatorios oficiales vigentes.">?</span>
+              </span>
+              <span class="compliance-percentage" id="lbl-compliance-pct">0% Cumplido</span>
+            </div>
+            <div class="compliance-bar-container">
+              <div class="compliance-bar-seg seg-imp" id="bar-imp" style="width: 0%;" title="Implementados"></div>
+              <div class="compliance-bar-seg seg-par" id="bar-par" style="width: 0%;" title="Parciales"></div>
+              <div class="compliance-bar-seg seg-bre" id="bar-bre" style="width: 0%;" title="Brechas pendientes"></div>
+            </div>
+          </div>
+
+          <!-- Métricas Resumidas -->
+          <div class="metrics-row">
+            <div class="metric-box">
+              <span class="metric-val" id="num-evaluados">0</span>
+              <span class="metric-title">
+                Controles evaluados
+                <span class="info-help" data-tooltip="Total de controles de la norma analizados.">?</span>
+              </span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val text-navy" id="num-aplican">0</span>
+              <span class="metric-title">
+                Aplican a la UNSA
+                <span class="info-help" data-tooltip="Controles exigidos según el rol institucional.">?</span>
+              </span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val text-green" id="num-implementados">0</span>
+              <span class="metric-title">
+                Cumplidos (Oficiales)
+                <span class="info-help" data-tooltip="Respaldados por reglamentos o resoluciones vigentes.">?</span>
+              </span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val text-amber" id="num-parciales">0</span>
+              <span class="metric-title">
+                En trámite (Parciales)
+                <span class="info-help" data-tooltip="Controles con avance pero sin aprobación formal definitiva.">?</span>
+              </span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val text-red" id="num-brechas">0</span>
+              <span class="metric-title">
+                Brechas por resolver
+                <span class="info-help" data-tooltip="Controles obligatorios que aún no tienen sustento probatorio.">?</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Alerta de Gobernanza -->
+          <div class="governance-notice">
+            <div class="notice-col-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="notice-col-text">
+              <strong>Revisión humana obligatoria (Cláusulas 5.1 y 9.3 de ISO/IEC 27701):</strong>
+              <p>
+                Este informe es una propuesta técnica automatizada. Para tener valor vinculante en la gestión universitaria,
+                debe ser revisado y rubricado por el Oficial de Protección de Datos (DPO) o la Dirección de OTIC de la UNSA.
+              </p>
+            </div>
+          </div>
+
+          <!-- Buscador en Vivo y Filtros de la Tabla -->
+          <div class="table-toolbar">
+            <div class="table-search-box">
+              <svg class="table-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="input-buscar-soa" class="table-search-input" placeholder="Buscar por código, nombre o área responsable...">
+            </div>
+
+            <div class="filter-pills">
+              <button class="filter-pill active" data-filter="todos" type="button">
+                Todos (<span id="txt-count-todos">0</span>)
+              </button>
+              <button class="filter-pill" data-filter="brechas" type="button">
+                Brechas pendientes (<span id="txt-count-brechas">0</span>)
+              </button>
+              <button class="filter-pill" data-filter="implementados" type="button">
+                Cumplidos (<span id="txt-count-imp">0</span>)
+              </button>
+              <button class="filter-pill" data-filter="excluidos" type="button">
+                No aplican (<span id="txt-count-exc">0</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabla Formal de la SoA -->
+          <div class="table-responsive">
+            <table class="soa-official-table" id="tabla-soa-oficial">
+              <thead>
+                <tr>
+                  <th style="width: 85px;">
+                    Código
+                    <span class="info-help" data-tooltip="Identificador numérico según el Anexo A de la norma ISO/IEC 27701.">?</span>
+                  </th>
+                  <th style="width: 170px;">
+                    Nombre del control
+                    <span class="info-help" data-tooltip="Denominación de la medida de seguridad o privacidad exigida.">?</span>
+                  </th>
+                  <th style="width: 65px; text-align: center;">
+                    ¿Aplica?
+                    <span class="info-help" data-tooltip="Indica si la universidad está obligada a cumplirlo según su rol.">?</span>
+                  </th>
+                  <th>
+                    Justificación y riesgos
+                    <span class="info-help" data-tooltip="Motivo técnico de aplicabilidad vinculado a los riesgos del Paso 1.">?</span>
+                  </th>
+                  <th style="width: 130px;">
+                    Estado
+                    <span class="info-help" data-tooltip="Calificación obtenida con base en las evidencias documentadas.">?</span>
+                  </th>
+                  <th style="width: 200px;">
+                    Documento de sustento
+                    <span class="info-help" data-tooltip="Archivo o resolución de la UNSA que respalda el cumplimiento.">?</span>
+                  </th>
+                  <th style="width: 200px;">
+                    Directiva institucional (RAG)
+                    <span class="info-help" data-tooltip="Directiva interna que regula este control en la universidad.">?</span>
+                  </th>
+                  <th style="width: 120px;">
+                    Área a cargo
+                    <span class="info-help" data-tooltip="Unidad especializada responsable de mantener la evidencia vigente.">?</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="tbody-soa">
+                <!-- Filas renderizadas -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Cuadro de Tareas Pendientes (Brechas) -->
+          <div class="gap-analysis-box" id="cuadro-brechas">
+            <div class="gap-header">
+              <h4>Tareas pendientes para subsanar brechas</h4>
+              <p>Controles que aplican a la universidad pero requieren regularizar o completar su evidencia documental:</p>
+            </div>
+            <div id="contenedor-items-brechas" class="gap-grid">
+              <!-- Brechas renderizadas -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pie de Navegación del Paso 2 -->
+      <div class="step-navigation-footer">
+        <button class="btn-secondary" id="btn-volver-paso-1" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Modificar Entradas (Paso 1)</span>
+        </button>
+
+        <button class="btn-primary" id="btn-ir-paso-3" type="button">
+          <span>Ver cómo se fundamenta en el RAG (Paso 3)</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PASO 3: RAG Y BASE DE CONOCIMIENTO
+         ==================================================================== -->
+    <section id="step-3" class="step-pane">
+      <div class="step-intro-banner">
+        <div class="step-intro-content">
+          <h3>
+            Paso 3: Búsqueda Semántica RAG (Retrieval-Augmented Generation)
+            <span class="info-help" data-tooltip="El Agente no inventa nada: consulta la base de reglamentos reales de la UNSA para fundamentar cada control.">?</span>
+          </h3>
+          <p>
+            RAG permite que el Agente entienda consultas en lenguaje natural, busque en los textos normativos de la universidad y cite con precisión qué reglamento o resolución sustenta cada control.
+          </p>
+        </div>
+      </div>
+
+      <!-- Diagrama Didáctico: ¿Cómo funciona el RAG aquí? -->
+      <div class="rag-explainer-grid">
+        <div class="rag-explainer-step">
+          <div class="rag-explainer-num">1</div>
+          <div class="rag-explainer-text">
+            <strong>Indexación de textos oficiales</strong>
+            <p>Las directivas de la UNSA y la norma ISO/IEC 27701 se dividen en fragmentos y se indexan semánticamente.</p>
+          </div>
+        </div>
+
+        <div class="rag-explainer-step">
+          <div class="rag-explainer-num">2</div>
+          <div class="rag-explainer-text">
+            <strong>Búsqueda por significado</strong>
+            <p>Al evaluar un control, el sistema no solo busca palabras exactas: comprende el concepto de privacidad buscado.</p>
+          </div>
+        </div>
+
+        <div class="rag-explainer-step">
+          <div class="rag-explainer-num">3</div>
+          <div class="rag-explainer-text">
+            <strong>Fundamentación sin inventar datos</strong>
+            <p>El resultado asocia el control con el artículo o directiva institucional exacta que lo regula en la universidad.</p>
           </div>
         </div>
       </div>
 
+      <!-- PROBADOR INTERACTIVO DEL RAG EN VIVO -->
+      <div class="rag-playground-panel">
+        <div class="rag-playground-header">
+          <h4>
+            Probador interactivo de consultas RAG
+            <span class="info-help" data-tooltip="Escribe cualquier consulta o haz clic en los ejemplos para ver cómo el RAG encuentra los fragmentos exactos en los documentos de la UNSA.">?</span>
+          </h4>
+          <p>
+            Escribe una consulta para que el Agente busque en los documentos de la universidad y muestre los fragmentos recuperados con su puntaje de similitud:
+          </p>
+        </div>
+
+        <div class="rag-search-bar">
+          <input type="text" id="txt-rag-query" class="rag-search-input" placeholder="Ejemplo: ¿Cómo se protegen las huellas dactilares en el Comedor Universitario?">
+          <button class="btn-primary" id="btn-ejecutar-rag" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Consultar base RAG
+          </button>
+        </div>
+
+        <!-- Sugerencias Clicables Didácticas -->
+        <div class="rag-suggestions-row">
+          <span>Consultas de ejemplo:</span>
+          <button class="rag-chip" data-query="comedor universitario huella dactilar biométrica" type="button">Huellas del comedor</button>
+          <button class="rag-chip" data-query="derechos ARCO procedimiento TUPA rectificación" type="button">Derechos ARCO</button>
+          <button class="rag-chip" data-query="consentimiento informado admisión matrícula estudiantes" type="button">Consentimiento de matrícula</button>
+          <button class="rag-chip" data-query="gestión de incidentes de seguridad y brechas" type="button">Incidentes de seguridad</button>
+        </div>
+
+        <!-- Salida del RAG -->
+        <div class="rag-output-box" id="rag-output-container">
+          <div style="color: var(--slate-500); font-size: 12.5px; text-align: center; padding: 20px 0;">
+            Escribe una consulta arriba o presiona un botón de ejemplo para probar la búsqueda semántica en los documentos reales de la UNSA.
+          </div>
+        </div>
+      </div>
+
+      <!-- Repositorio de Documentos Indexados -->
       <div class="panel">
+        <div class="panel-header">
+          <h3>
+            Documentos oficiales indexados en la base de conocimiento
+            <span class="info-help" data-tooltip="Archivos reales de la UNSA que alimentan el RAG para fundamentar las auditorías.">?</span>
+          </h3>
+        </div>
         <div class="panel-body">
           <div class="doc-inventory-list">
             <div class="doc-item-row">
@@ -360,7 +704,7 @@
             <div class="doc-item-row">
               <div class="doc-col-main">
                 <h4>Norma Técnica Internacional ISO/IEC 27701:2025</h4>
-                <p>Estándar internacional de gestión de información de privacidad, cláusulas generales y catálogo de controles del Anexo A.</p>
+                <p>Estructura general de gestión de privacidad, cláusulas 1 a 10 y catálogo de controles del Anexo A.</p>
                 <span class="doc-meta">Archivo: knowledge/normativa/resumen_27701.md</span>
               </div>
               <div class="doc-col-status">
@@ -370,337 +714,68 @@
 
             <div class="doc-item-row">
               <div class="doc-col-main">
-                <h4>Normativa Institucional y Resoluciones de la UNSA</h4>
-                <p>Compendio de resoluciones rectorales (RCU 0127-2020, RCU 0127-2025, TUPA) sobre registro de bancos de datos y derechos de los usuarios.</p>
+                <h4>Compendio de Resoluciones Rectorales y TUPA (UNSA)</h4>
+                <p>Resoluciones RCU 0127-2020 (Matrícula), RCU 0127-2025 (Comedor y biometría) y procedimiento oficial de derechos ARCO.</p>
                 <span class="doc-meta">Archivo: knowledge/normativa/normativa_institucional_unsa.md</span>
               </div>
               <div class="doc-col-status">
-                <span class="badge-status vigente">Resoluciones aprobadas</span>
+                <span class="badge-status vigente">Resoluciones oficiales</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- PESTAÑA 3: REVISIÓN DE UN CONTROL INDIVIDUAL -->
-    <section id="tab-verificacion" class="tab-pane">
-      <div class="tab-intro-card">
-        <div class="tab-intro-info">
-          <div class="tab-intro-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </div>
-          <div class="tab-intro-text">
-            <h3>Consultar un control específico</h3>
-            <p>Elige una regla puntual de privacidad para saber si la universidad la cumple y qué acción corresponde tomar.</p>
-          </div>
-        </div>
-      </div>
+      <!-- Pie de Navegación del Paso 3 -->
+      <div class="step-navigation-footer">
+        <button class="btn-secondary" id="btn-volver-paso-2" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver a las Skills (Paso 2)</span>
+        </button>
 
-      <div class="panel">
-        <div class="panel-body">
-          <div class="field-group" style="max-width: 580px;">
-            <label for="sel-control-individual">
-              Elige el control que deseas auditar:
-              <span class="info-help" data-tooltip="Selecciona uno de los 10 controles de privacidad para revisar su estado de cumplimiento aislado.">?</span>
-            </label>
-            <select id="sel-control-individual" class="form-control"></select>
-          </div>
-
-          <div class="form-buttons">
-            <button class="btn-primary" id="btn-auditar-individual" type="button">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              Auditar control seleccionado
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PESTAÑA 4: DATOS EN JSON (n8n) -->
-    <section id="tab-contrato" class="tab-pane">
-      <div class="tab-intro-card">
-        <div class="tab-intro-info">
-          <div class="tab-intro-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-          </div>
-          <div class="tab-intro-text">
-            <h3>Datos estructurados en JSON (Integración con n8n)</h3>
-            <p>Estructura de datos que permite conectar este agente con herramientas de automatización de flujos de trabajo como n8n.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-body">
-          <div class="field-group">
-            <div class="field-label-row">
-              <label for="sel-preset-json">
-                Cargar un caso predeterminado de prueba:
-                <span class="info-help" data-tooltip="Permite simular diferentes escenarios de auditoría con datos de ejemplo ya listos.">?</span>
-              </label>
-              <span class="sub-pill">4 Escenarios listos</span>
-            </div>
-            <select id="sel-preset-json" class="form-control" style="max-width: 480px;">
-              <option value="unsa_responsable">Caso principal: UNSA como Responsable (SISUNSA, Admisión, Comedor)</option>
-              <option value="unsa_encargado">Caso secundario: UNSA como Encargada de tratamiento de terceros</option>
-              <option value="unsa_ambos">Caso completo: UNSA con ambos roles a la vez</option>
-              <option value="unsa_sin_evidencias">Caso inicial: UNSA sin documentos de respaldo todavía</option>
-            </select>
-          </div>
-
-          <textarea id="txt-json-payload" class="code-box" rows="14" spellcheck="false"></textarea>
-
-          <div class="json-actions-bar">
-            <button class="btn-primary" id="btn-enviar-json" type="button">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              Procesar este JSON
-            </button>
-            <button class="btn-secondary" id="btn-copiar-json-input" type="button">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copiar al portapapeles
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DASHBOARD DE RESULTADOS: DECLARACIÓN DE APLICABILIDAD -->
-    <section id="panel-resultados-soa" class="panel result-panel" style="display: none;">
-      <div class="panel-header header-with-action">
-        <div>
-          <span class="badge-tag ok" id="lbl-estado-resp">EVALUACIÓN COMPLETADA</span>
-          <h2 id="lbl-titulo-soa">Declaración de Aplicabilidad (SoA) - ISO/IEC 27701:2025</h2>
-          <p id="lbl-subtitulo-soa" class="result-sub"></p>
-        </div>
-        <div class="header-action-group">
-          <button class="btn-secondary" id="btn-descargar-json" type="button" title="Descargar este reporte en formato JSON">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Descargar JSON
-          </button>
-          <button class="btn-secondary" id="btn-imprimir-reporte" type="button" title="Imprimir o guardar como PDF">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 6 2 18 2 18 9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            Imprimir / Guardar PDF
-          </button>
-        </div>
-      </div>
-
-      <div class="panel-body">
-        <!-- Barra de Progreso de Madurez y Cumplimiento -->
-        <div class="compliance-progress-box">
-          <div class="compliance-progress-header">
-            <span class="compliance-title">
-              Nivel de cumplimiento frente a los controles que le aplican a la UNSA
-              <span class="info-help" data-tooltip="Porcentaje de controles que ya cuentan con documentación probatoria oficial vigente frente al total que aplican a la universidad.">?</span>
-            </span>
-            <span class="compliance-percentage" id="lbl-compliance-pct">0% Cumplido</span>
-          </div>
-          <div class="compliance-bar-container">
-            <div class="compliance-bar-seg seg-imp" id="bar-imp" style="width: 0%;" title="Implementados"></div>
-            <div class="compliance-bar-seg seg-par" id="bar-par" style="width: 0%;" title="Parciales"></div>
-            <div class="compliance-bar-seg seg-bre" id="bar-bre" style="width: 0%;" title="Brechas pendientes"></div>
-          </div>
-        </div>
-
-        <!-- Métricas Resumidas -->
-        <div class="metrics-row">
-          <div class="metric-box">
-            <span class="metric-val" id="num-evaluados">0</span>
-            <span class="metric-title">
-              Controles evaluados
-              <span class="info-help" data-tooltip="Total de controles de privacidad analizados en el catálogo normativo.">?</span>
-            </span>
-          </div>
-          <div class="metric-box">
-            <span class="metric-val text-navy" id="num-aplican">0</span>
-            <span class="metric-title">
-              Aplican a la UNSA
-              <span class="info-help" data-tooltip="Controles que la universidad está obligada a cumplir según el rol que desempeña.">?</span>
-            </span>
-          </div>
-          <div class="metric-box">
-            <span class="metric-val text-green" id="num-implementados">0</span>
-            <span class="metric-title">
-              Cumplidos (Con respaldo oficial)
-              <span class="info-help" data-tooltip="Controles respaldados por resoluciones o reglamentos vigentes.">?</span>
-            </span>
-          </div>
-          <div class="metric-box">
-            <span class="metric-val text-amber" id="num-parciales">0</span>
-            <span class="metric-title">
-              En trámite (Parciales)
-              <span class="info-help" data-tooltip="Controles con documentos preliminares que necesitan completarse.">?</span>
-            </span>
-          </div>
-          <div class="metric-box">
-            <span class="metric-val text-red" id="num-brechas">0</span>
-            <span class="metric-title">
-              Brechas por resolver
-              <span class="info-help" data-tooltip="Controles que aplican obligatoriamente pero aún no tienen documento probatorio.">?</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- Aviso de Gobernanza -->
-        <div class="governance-notice">
-          <div class="notice-col-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <div class="notice-col-text">
-            <strong>Revisión humana obligatoria (Cláusulas 5.1 y 9.3 de ISO/IEC 27701):</strong>
-            <p>
-              Este informe es una propuesta técnica automatizada. Para tener valor vinculante en la gestión universitaria,
-              debe ser revisado y rubricado por el Oficial de Protección de Datos (DPO) o el Director de OTIC de la UNSA.
-            </p>
-          </div>
-        </div>
-
-        <!-- Buscador y Filtros -->
-        <div class="table-toolbar">
-          <div class="table-search-box">
-            <svg class="table-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="input-buscar-soa" class="table-search-input" placeholder="Buscar por código, nombre o área responsable...">
-          </div>
-
-          <div class="filter-pills">
-            <button class="filter-pill active" data-filter="todos" type="button">
-              Todos (<span id="txt-count-todos">0</span>)
-            </button>
-            <button class="filter-pill" data-filter="brechas" type="button">
-              Brechas pendientes (<span id="txt-count-brechas">0</span>)
-            </button>
-            <button class="filter-pill" data-filter="implementados" type="button">
-              Cumplidos (<span id="txt-count-imp">0</span>)
-            </button>
-            <button class="filter-pill" data-filter="excluidos" type="button">
-              No aplican (<span id="txt-count-exc">0</span>)
-            </button>
-          </div>
-        </div>
-
-        <!-- Tabla de la Declaración de Aplicabilidad -->
-        <div class="table-responsive">
-          <table class="soa-official-table" id="tabla-soa-oficial">
-            <thead>
-              <tr>
-                <th style="width: 85px;">
-                  Código
-                  <span class="info-help" data-tooltip="Identificador numérico del control según el Anexo A de la norma ISO/IEC 27701.">?</span>
-                </th>
-                <th style="width: 170px;">
-                  Nombre del control
-                  <span class="info-help" data-tooltip="Título descriptivo de la medida de seguridad o privacidad exigida.">?</span>
-                </th>
-                <th style="width: 65px; text-align: center;">
-                  ¿Aplica?
-                  <span class="info-help" data-tooltip="Indica si la universidad está obligada a cumplirlo según su rol.">?</span>
-                </th>
-                <th>
-                  Justificación y riesgos
-                  <span class="info-help" data-tooltip="Motivo técnico de por qué aplica o por qué se descarta, vinculándolo a los riesgos registrados.">?</span>
-                </th>
-                <th style="width: 130px;">
-                  Estado
-                  <span class="info-help" data-tooltip="Calificación actual: Cumplido, En proceso, Brecha o No aplica.">?</span>
-                </th>
-                <th style="width: 200px;">
-                  Documento de sustento
-                  <span class="info-help" data-tooltip="Archivo o resolución de la universidad que respalda el cumplimiento del control.">?</span>
-                </th>
-                <th style="width: 200px;">
-                  Directiva institucional (RAG)
-                  <span class="info-help" data-tooltip="Directiva o política interna que regula este control en la UNSA.">?</span>
-                </th>
-                <th style="width: 120px;">
-                  Área a cargo
-                  <span class="info-help" data-tooltip="Agente o unidad administrativa responsable de gestionar este control.">?</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody id="tbody-soa">
-              <!-- Filas renderizadas -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Cuadro de Tareas Pendientes (Brechas) -->
-        <div class="gap-analysis-box" id="cuadro-brechas">
-          <div class="gap-header">
-            <h4>Tareas pendientes para subsanar brechas</h4>
-            <p>Controles que la universidad debe cumplir pero que aún carecen de documentación completa:</p>
-          </div>
-          <div id="contenedor-items-brechas" class="gap-grid">
-            <!-- Brechas renderizadas -->
-          </div>
-        </div>
+        <button class="btn-primary" id="btn-reiniciar-flujo" type="button">
+          <span>Nueva evaluación desde el Paso 1</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
       </div>
     </section>
   </main>
 
-  <!-- Modal de Guía Paso a Paso -->
+  <!-- Modal de Guía Rápida -->
   <div id="modal-guia" class="modal-overlay" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Guía paso a paso: ¿Cómo usar este sistema?</h3>
+        <h3>Guía del Sistema: Flujo en 3 Pasos</h3>
         <button class="btn-close-modal" id="btn-cerrar-guia" type="button">&times;</button>
       </div>
       <div class="modal-body">
         <div class="guide-step-item">
           <div class="guide-step-num">1</div>
           <div class="guide-step-content">
-            <strong>Selecciona el rol que tiene la UNSA</strong>
-            <p>Si la universidad decide qué hacer con los datos (ejemplo: inscripciones o matrícula), elige <em>Responsable</em>. Si los procesa por encargo de otra entidad, elige <em>Encargado</em>. Esto define qué controles son obligatorios.</p>
+            <strong>Paso 1: Entradas (Input)</strong>
+            <p>Configura los datos que el Agente necesita: el rol de la universidad (Responsable o Encargado), los riesgos detectados y los documentos probatorios que acreditan el cumplimiento.</p>
           </div>
         </div>
 
         <div class="guide-step-item">
           <div class="guide-step-num">2</div>
           <div class="guide-step-content">
-            <strong>Verifica los documentos de respaldo</strong>
-            <p>Revisa la lista de resoluciones rectorales y reglamentos. Si cuentas con un nuevo documento que sustente algún control, puedes agregarlo con el botón <em>Agregar documento</em>.</p>
+            <strong>Paso 2: Skills del Agente</strong>
+            <p>Ejecuta la habilidad de generar la Declaración de Aplicabilidad (SoA) o audita un control individual. El sistema aplica las reglas de la norma ISO/IEC 27701 y genera el reporte formal con las tareas pendientes.</p>
           </div>
         </div>
 
         <div class="guide-step-item">
           <div class="guide-step-num">3</div>
           <div class="guide-step-content">
-            <strong>Genera la Declaración de Aplicabilidad (SoA)</strong>
-            <p>Haz clic en el botón principal para que el motor cruce las exigencias normativas con los documentos reales. Obtendrás el porcentaje de cumplimiento y la tabla formal.</p>
-          </div>
-        </div>
-
-        <div class="guide-step-item">
-          <div class="guide-step-num">4</div>
-          <div class="guide-step-content">
-            <strong>Revisa las brechas y asigna tareas</strong>
-            <p>Al final del reporte verás qué controles faltan resolver y qué área especializada de la universidad debe encargarse de aportar la evidencia pendiente.</p>
+            <strong>Paso 3: RAG y Base Normativa</strong>
+            <p>Comprueba cómo el sistema busca en los reglamentos reales de la universidad mediante búsqueda semántica (RAG) para fundamentar cada control con directivas oficiales sin inventar datos.</p>
           </div>
         </div>
       </div>

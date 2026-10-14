@@ -1,8 +1,10 @@
 /* ==========================================================================
    SISTEMA DE GESTIÓN DE PRIVACIDAD (PIMS) - ISO/IEC 27701:2025
    Universidad Nacional de San Agustín de Arequipa (UNSA)
-   Diseño UX/UI: Didáctico, Explicativo, Minimalista y Profesional
-   Paleta: Neutros Tecnológicos y Granate Institucional (Sin azul ni verde en botones)
+   Arquitectura UX: Flujo Secuencial en 3 Pasos
+   1. Entradas (Input) -> 2. Skills del Agente -> 3. Base RAG
+   Diseño: Minimalista, Didáctico y Profesional
+   Paleta: Neutros Tecnológicos (Sin azul ni verde en botones)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -14,7 +16,7 @@
   --unsa-burgundy-light: #881337;
   --unsa-burgundy-subtle: #fdf2f4;
   
-  /* Escala Neutral Profesional */
+  /* Escala Neutral */
   --slate-950: #090d16;
   --slate-900: #111827;
   --slate-800: #1f2937;
@@ -28,7 +30,7 @@
   --slate-50:  #f9fafb;
   --surface-card: #ffffff;
   
-  /* Botones Primarios y Acciones (Grafito / Carbón Neutro - Cero Azul, Cero Verde) */
+  /* Botones (Cero azul, cero verde) */
   --btn-primary-bg: #111827;
   --btn-primary-hover: #1f2937;
   --btn-primary-text: #ffffff;
@@ -37,21 +39,8 @@
   --btn-secondary-hover: #f9fafb;
   --btn-secondary-border: #d1d5db;
   --btn-secondary-text: #1f2937;
-
-  /* Estados de Auditoría en Etiquetas (No botones) */
-  --badge-ok-bg: #f0fdf4;
-  --badge-ok-text: #166534;
-  --badge-ok-border: #bbf7d0;
-
-  --badge-par-bg: #fffbeb;
-  --badge-par-text: #92400e;
-  --badge-par-border: #fde68a;
-
-  --badge-bre-bg: #fef2f2;
-  --badge-bre-text: #991b1b;
-  --badge-bre-border: #fecaca;
   
-  /* Radios y Sombras */
+  /* Medidas y Bordes */
   --radius-xs: 5px;
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -86,7 +75,7 @@ body {
   flex-direction: column;
 }
 
-/* Scrollbar estilizado */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
@@ -102,7 +91,7 @@ body {
   background: var(--slate-400);
 }
 
-/* 1. Barra Superior */
+/* 1. Header */
 .header-gob {
   background: var(--surface-card);
   border-bottom: 1px solid var(--slate-200);
@@ -204,7 +193,6 @@ body {
   color: var(--slate-800);
 }
 
-/* Indicador de Conexión */
 .connection-status {
   display: flex;
   align-items: center;
@@ -233,7 +221,6 @@ body {
   background-color: #b45309;
 }
 
-/* Botón de Guía Superior (Gris Carbón / Neutro) */
 .btn-help-trigger {
   display: inline-flex;
   align-items: center;
@@ -255,7 +242,7 @@ body {
   border-color: var(--slate-400);
 }
 
-/* Banner de Notificación del Servidor */
+/* Alerta de conexión */
 .server-notice {
   background: #fffbeb;
   border-bottom: 1px solid #fef08a;
@@ -290,85 +277,95 @@ body {
   flex: 1;
 }
 
-/* 3. Apartado de Contexto Didáctico */
-.context-highlight-box {
+/* 3. STEPPER VISUAL DE 3 PASOS (Flujo Mental del Sistema) */
+.workflow-stepper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .workflow-stepper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.step-card-nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   background: #ffffff;
-  border: 1px solid var(--slate-200);
-  border-left: 4px solid var(--unsa-burgundy);
+  border: 1.5px solid var(--slate-200);
   border-radius: var(--radius-md);
-  padding: 18px 22px;
-  margin-bottom: 22px;
-  box-shadow: var(--shadow-xs);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.step-card-nav:hover {
+  border-color: var(--slate-300);
+  background: var(--slate-50);
+}
+
+.step-card-nav.active {
+  border-color: var(--slate-900);
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.step-card-nav.active::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--unsa-burgundy);
+}
+
+.step-number-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--slate-100);
+  color: var(--slate-700);
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--slate-200);
   transition: var(--transition-fast);
 }
 
-.context-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
+.step-card-nav.active .step-number-circle {
+  background: var(--slate-900);
+  color: #ffffff;
+  border-color: var(--slate-900);
 }
 
-.context-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.step-nav-content {
+  flex: 1;
+  min-width: 0;
 }
 
-.context-title {
-  font-size: 14.5px;
+.step-nav-title {
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--slate-900);
+  line-height: 1.25;
 }
 
-.context-subtitle {
-  font-size: 12px;
-  color: var(--slate-500);
-  margin-top: 1px;
-}
-
-.btn-toggle-context {
-  background: transparent;
-  border: 1px solid var(--slate-200);
-  color: var(--slate-600);
+.step-nav-desc {
   font-size: 11.5px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.btn-toggle-context:hover {
-  background: var(--slate-100);
-  color: var(--slate-900);
-}
-
-.context-body {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--slate-100);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--slate-600);
-}
-
-.context-card-item {
-  background: var(--slate-50);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-}
-
-.context-card-item strong {
-  color: var(--slate-900);
-  font-size: 13px;
-  display: block;
-  margin-bottom: 4px;
+  color: var(--slate-500);
+  margin-top: 2px;
+  line-height: 1.35;
 }
 
 /* 4. Mini Símbolo de Interrogación Universal (?) */
@@ -390,7 +387,6 @@ body {
   margin-left: 5px;
   transition: all var(--transition-fast);
   border: 1px solid var(--slate-300);
-  text-decoration: none;
 }
 
 .info-help:hover, .info-help:focus {
@@ -399,7 +395,6 @@ body {
   border-color: var(--slate-900);
 }
 
-/* Tooltip emergente al pasar el mouse por el (?) */
 .info-help::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -414,7 +409,7 @@ body {
   font-weight: 400;
   line-height: 1.45;
   width: max-content;
-  max-width: 250px;
+  max-width: 260px;
   white-space: normal;
   text-align: left;
   box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.25);
@@ -451,63 +446,13 @@ body {
   visibility: visible;
 }
 
-/* 5. Pestañas de Navegación Segmentadas */
-.nav-tabs {
-  display: flex;
-  gap: 6px;
-  background: var(--slate-100);
-  padding: 4px;
-  border-radius: var(--radius-md);
-  margin-bottom: 22px;
-  border: 1px solid var(--slate-200);
-  overflow-x: auto;
-}
-
-.nav-tab-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border: none;
-  background: transparent;
-  color: var(--slate-600);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: var(--transition-fast);
-  white-space: nowrap;
-}
-
-.nav-tab-item svg {
-  width: 15px;
-  height: 15px;
-  color: var(--slate-400);
-}
-
-.nav-tab-item:hover {
-  color: var(--slate-900);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.nav-tab-item.active {
-  background: #ffffff;
-  color: var(--slate-900);
-  box-shadow: var(--shadow-sm);
-}
-
-.nav-tab-item.active svg {
-  color: var(--unsa-burgundy);
-}
-
-/* Paneles de Pestañas */
-.tab-pane {
+/* 5. Vistas de cada Paso (Tabs del Stepper) */
+.step-pane {
   display: none;
   animation: fadeIn 0.2s ease-out;
 }
 
-.tab-pane.active {
+.step-pane.active {
   display: block;
 }
 
@@ -516,52 +461,40 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Encabezado contextual de cada pestaña */
-.tab-intro-card {
+/* Tarjeta explicativa de cada paso */
+.step-intro-banner {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-left: 4px solid var(--unsa-burgundy);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
-  margin-bottom: 18px;
+  gap: 16px;
 }
 
-.tab-intro-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.tab-intro-icon {
-  width: 34px;
-  height: 34px;
-  background: var(--slate-100);
-  color: var(--slate-700);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.tab-intro-text h3 {
-  font-size: 13.5px;
+.step-intro-content h3 {
+  font-size: 14.5px;
   font-weight: 700;
   color: var(--slate-900);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.tab-intro-text p {
-  font-size: 12px;
-  color: var(--slate-500);
-  margin-top: 1px;
+.step-intro-content p {
+  font-size: 12.5px;
+  color: var(--slate-600);
+  margin-top: 3px;
+  line-height: 1.45;
 }
 
-/* 6. Layout Grid de 2 Columnas */
+/* 6. Layout Grid de Columnas */
 .layout-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1.05fr 1fr;
   gap: 20px;
   align-items: start;
 }
@@ -572,7 +505,7 @@ body {
   }
 }
 
-/* Paneles y Tarjetas */
+/* Paneles */
 .panel {
   background: var(--surface-card);
   border: 1px solid var(--slate-200);
@@ -592,7 +525,7 @@ body {
 }
 
 .panel-header h3 {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--slate-900);
   display: flex;
@@ -617,7 +550,7 @@ body {
   padding: 18px;
 }
 
-/* Campos de Formulario */
+/* Form Controls */
 .field-group {
   margin-bottom: 16px;
 }
@@ -666,7 +599,7 @@ body {
   cursor: default;
 }
 
-/* Selector de Roles: Tarjetas Seleccionables */
+/* Selector de Roles */
 .role-options {
   display: flex;
   flex-direction: column;
@@ -740,7 +673,7 @@ body {
   border: 1px solid var(--slate-200);
 }
 
-/* Riesgos Vinculados */
+/* Riesgos */
 .risk-summary-box {
   display: flex;
   flex-direction: column;
@@ -783,7 +716,7 @@ body {
   margin-top: 4px;
 }
 
-/* Documentos de Respaldo (Evidencias) */
+/* Documentos de Respaldo */
 .section-help {
   font-size: 12px;
   color: var(--slate-500);
@@ -808,7 +741,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 360px;
+  max-height: 340px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -923,7 +856,6 @@ body {
   border-radius: var(--radius-sm);
 }
 
-/* Formulario desplegable */
 .box-subform {
   margin-top: 12px;
   padding: 14px;
@@ -952,9 +884,52 @@ body {
   margin-top: 12px;
 }
 
+/* Acordeón para entrada JSON alternativa */
+.json-input-accordion {
+  margin-top: 20px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.json-input-header {
+  padding: 12px 18px;
+  background: var(--slate-50);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.json-input-header:hover {
+  background: var(--slate-100);
+}
+
+.json-input-header.open {
+  border-bottom-color: var(--slate-200);
+}
+
+.json-input-header h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.json-input-body {
+  padding: 16px;
+  display: none;
+}
+
+.json-input-body.open {
+  display: block;
+}
+
 /* ==========================================================================
    7. BOTONES (ESTRICTAMENTE SIN AZUL NI VERDE)
-   Paleta: Neutros Tecnológicos (Carbón / Grafito) y Blanco/Borde Sutil
+   Paleta: Neutros Tecnológicos (Carbón / Grafito) y Blanco con Borde
    ========================================================================== */
 
 .btn-primary, .btn-primary-block {
@@ -1064,11 +1039,79 @@ body {
   color: var(--slate-900);
 }
 
-.execute-action-area {
-  margin-top: 18px;
+/* Pie de Navegación de cada Paso */
+.step-navigation-footer {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--slate-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* 8. Resultados de la SoA */
+/* 8. PASO 2: TARJETAS DE SKILLS */
+.skills-selection-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .skills-selection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skill-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow-xs);
+  transition: var(--transition-fast);
+}
+
+.skill-card:hover {
+  border-color: var(--slate-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.skill-card-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--slate-100);
+  color: var(--slate-700);
+  border: 1px solid var(--slate-200);
+  width: max-content;
+  margin-bottom: 6px;
+}
+
+.skill-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--slate-900);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-card p {
+  font-size: 12.5px;
+  color: var(--slate-600);
+  line-height: 1.45;
+}
+
+/* Resultados de la SoA */
 .result-panel {
   margin-top: 24px;
   border-top: 3px solid var(--unsa-burgundy);
@@ -1163,7 +1206,7 @@ body {
 .compliance-bar-seg.seg-par { background-color: #b45309; }
 .compliance-bar-seg.seg-bre { background-color: #b91c1c; }
 
-/* Indicadores Métricos */
+/* Métricas */
 .metrics-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -1199,7 +1242,6 @@ body {
   color: var(--slate-500);
 }
 
-/* Aviso de Gobernanza */
 .governance-notice {
   background: #fffbeb;
   border: 1px solid #fde68a;
@@ -1413,7 +1455,6 @@ body {
   font-size: 11px;
 }
 
-/* Plan de Brechas */
 .gap-analysis-box {
   background: var(--slate-50);
   border: 1px solid var(--slate-200);
@@ -1471,7 +1512,174 @@ body {
   color: var(--slate-800);
 }
 
-/* Repositorio Documental RAG */
+/* ==========================================================================
+   9. PASO 3: RAG Y BASE DE CONOCIMIENTO
+   ========================================================================== */
+
+.rag-explainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.rag-explainer-step {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.rag-explainer-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--slate-100);
+  color: var(--slate-800);
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--slate-200);
+}
+
+.rag-explainer-text strong {
+  font-size: 13px;
+  color: var(--slate-900);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.rag-explainer-text p {
+  font-size: 12px;
+  color: var(--slate-600);
+  line-height: 1.4;
+}
+
+/* Probador Interactivo del RAG */
+.rag-playground-panel {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.rag-playground-header h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.rag-playground-header p {
+  font-size: 12px;
+  color: var(--slate-500);
+  margin-top: 2px;
+  margin-bottom: 14px;
+}
+
+.rag-search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.rag-search-input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 13px;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-sm);
+  outline: none;
+  font-family: inherit;
+}
+
+.rag-search-input:focus {
+  border-color: var(--slate-900);
+}
+
+.rag-suggestions-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: var(--slate-500);
+  margin-bottom: 16px;
+}
+
+.rag-chip {
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  color: var(--slate-700);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.rag-chip:hover {
+  background: var(--slate-200);
+  color: var(--slate-900);
+}
+
+.rag-output-box {
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  min-height: 100px;
+}
+
+.rag-hit-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.rag-hit-card:last-child {
+  margin-bottom: 0;
+}
+
+.rag-hit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.rag-hit-source {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--slate-700);
+}
+
+.rag-hit-score {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.rag-hit-text {
+  font-size: 12px;
+  color: var(--slate-700);
+  line-height: 1.45;
+}
+
+/* Repositorio Documental */
 .doc-inventory-list {
   display: flex;
   flex-direction: column;
@@ -1518,7 +1726,6 @@ body {
   border-radius: var(--radius-pill);
 }
 
-/* Contrato JSON */
 .code-box {
   width: 100%;
   font-family: 'JetBrains Mono', monospace;
@@ -1540,7 +1747,7 @@ body {
   margin-top: 10px;
 }
 
-/* Modal de Guía Rápida */
+/* Modal de Guía */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -1633,7 +1840,7 @@ body {
   line-height: 1.4;
 }
 
-/* Pie de Página */
+/* Footer */
 .footer-gob {
   background: var(--surface-card);
   border-top: 1px solid var(--slate-200);
@@ -1658,7 +1865,7 @@ body {
 
 /* Impresión */
 @media print {
-  .header-gob, .nav-tabs, .btn-primary, .btn-secondary, .btn-help-trigger, .table-toolbar, .footer-gob, .modal-overlay, #tab-evidencias, #tab-contrato, #tab-verificacion, .context-highlight-box {
+  .header-gob, .workflow-stepper, .step-navigation-footer, .btn-primary, .btn-secondary, .btn-help-trigger, .table-toolbar, .footer-gob, .modal-overlay, #step-input, #step-rag, .skills-selection-grid {
     display: none !important;
   }
   body {
@@ -1670,9 +1877,8 @@ body {
     padding: 0 !important;
     max-width: 100% !important;
   }
-  .panel {
-    border: none !important;
-    box-shadow: none !important;
+  .step-pane {
+    display: block !important;
   }
   .result-panel {
     display: block !important;

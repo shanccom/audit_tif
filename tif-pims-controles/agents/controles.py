@@ -182,6 +182,7 @@ class AgenteControles:
             )
         return self._resp(
             "consultar", "ok", "\n\n".join(h["texto"] for h in hits),
+            datos={"hits": hits},
             fuentes=sorted({h["meta"] for h in hits}),
             confianza=round(hits[0]["score"], 3),
         )

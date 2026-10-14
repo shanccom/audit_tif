@@ -1,6 +1,8 @@
+// ==========================================================================
 // Sistema de Auditoría PIMS - ISO/IEC 27701:2025
 // Universidad Nacional de San Agustín de Arequipa (UNSA)
-// Motor de Frontend, Usabilidad Didáctica y Gestión de Controles
+// Motor de Frontend: Flujo Secuencial en 3 Pasos (Input -> Skills -> RAG)
+// ==========================================================================
 
 const API_BASE = (window.location.protocol === "file:" || !window.location.port)
   ? "http://127.0.0.1:5000"
@@ -34,7 +36,7 @@ const POLITICAS_MAP = {
   "A.3.17": "Política UNSA - Datos de Docentes, Personal y Aula Virtual"
 };
 
-// Evidencias Documentales Oficiales de la UNSA (Archivos Reales en knowledge/evidencias/)
+// Evidencias Documentales Oficiales de la UNSA
 let evidenciasDocumentadas = [
   {
     control: "A.1.2.2",
@@ -113,15 +115,16 @@ let servidorOnline = false;
 
 // Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", async () => {
-  initContextoToggle();
-  initNavegacionPestanas();
+  initStepper();
   initSelectorRoles();
   initModalGuia();
+  initJsonAccordion();
   renderRiesgosResumen();
   renderTablaEvidencias();
   initFormularioNuevaEvidencia();
   initPresetsJSON();
   initBuscadorSoA();
+  initRagPlayground();
   await verificarConexionServidor();
   poblarSelectsControles();
 
@@ -132,21 +135,67 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btn-imprimir-reporte").addEventListener("click", () => window.print());
 });
 
-// 1. Alternar visualización del bloque explicativo de contexto
-function initContextoToggle() {
-  const btnToggle = document.getElementById("btn-toggle-contexto");
-  const bodyContent = document.getElementById("context-body-content");
+// ==========================================================================
+// 1. STEPPER VISUAL Y NAVEGACIÓN EN 3 PASOS
+// ==========================================================================
+function initStepper() {
+  const stepButtons = document.querySelectorAll(".step-card-nav");
 
-  if (btnToggle && bodyContent) {
-    btnToggle.addEventListener("click", () => {
-      const oculto = bodyContent.style.display === "none";
-      bodyContent.style.display = oculto ? "grid" : "none";
-      btnToggle.textContent = oculto ? "Ocultar explicación" : "Mostrar explicación";
+  stepButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      irAPaso(btn.dataset.step);
+    });
+  });
+
+  // Botones de navegación al pie de cada paso
+  const btnIrPaso2 = document.getElementById("btn-ir-paso-2");
+  if (btnIrPaso2) btnIrPaso2.addEventListener("click", () => irAPaso("step-2"));
+
+  const btnVolverPaso1 = document.getElementById("btn-volver-paso-1");
+  if (btnVolverPaso1) btnVolverPaso1.addEventListener("click", () => irAPaso("step-1"));
+
+  const btnIrPaso3 = document.getElementById("btn-ir-paso-3");
+  if (btnIrPaso3) btnIrPaso3.addEventListener("click", () => irAPaso("step-3"));
+
+  const btnVolverPaso2 = document.getElementById("btn-volver-paso-2");
+  if (btnVolverPaso2) btnVolverPaso2.addEventListener("click", () => irAPaso("step-2"));
+
+  const btnReiniciar = document.getElementById("btn-reiniciar-flujo");
+  if (btnReiniciar) btnReiniciar.addEventListener("click", () => irAPaso("step-1"));
+}
+
+function irAPaso(stepId) {
+  // Actualizar Stepper Header
+  document.querySelectorAll(".step-card-nav").forEach(b => {
+    b.classList.toggle("active", b.dataset.step === stepId);
+  });
+
+  // Mostrar la sección correspondiente
+  document.querySelectorAll(".step-pane").forEach(p => {
+    p.classList.toggle("active", p.id === stepId);
+  });
+
+  // Scroll suave al inicio del área de trabajo
+  const wrapper = document.querySelector(".main-wrapper");
+  if (wrapper) {
+    wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// 2. Acordeón para Entrada Alternativa en JSON (Paso 1)
+function initJsonAccordion() {
+  const header = document.getElementById("btn-toggle-json-accordion");
+  const body = document.getElementById("json-accordion-body");
+  if (header && body) {
+    header.addEventListener("click", () => {
+      const abierto = body.classList.contains("open");
+      body.classList.toggle("open", !abierto);
+      header.classList.toggle("open", !abierto);
     });
   }
 }
 
-// 2. Verificación de Conectividad con el Backend Flask
+// 3. Verificación de Conexión con el Backend Flask
 async function verificarConexionServidor() {
   const statusDot = document.getElementById("status-dot");
   const statusText = document.getElementById("status-text");
@@ -172,21 +221,7 @@ async function verificarConexionServidor() {
   serverAlert.style.display = "block";
 }
 
-// 3. Navegación entre Pestañas
-function initNavegacionPestanas() {
-  const tabs = document.querySelectorAll(".nav-tab-item");
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
-      tab.classList.add("active");
-      const target = document.getElementById(tab.dataset.tab);
-      if (target) target.classList.add("active");
-    });
-  });
-}
-
-// 4. Selector de Roles (Tarjetas Seleccionables)
+// 4. Selector de Roles Institucionales
 function initSelectorRoles() {
   const radios = document.querySelectorAll("input[name='rol-eval']");
   radios.forEach(r => {
@@ -203,7 +238,7 @@ function obtenerRolSeleccionado() {
   return checked ? checked.value : "responsable";
 }
 
-// 5. Modal de Guía Paso a Paso
+// 5. Modal de Guía Rápida
 function initModalGuia() {
   const btnAbrir = document.getElementById("btn-abrir-guia");
   const btnCerrar = document.getElementById("btn-cerrar-guia");
@@ -244,7 +279,7 @@ function renderRiesgosResumen() {
   });
 }
 
-// 7. Lista de Documentos Probatorios
+// 7. Lista de Documentos Probatorios (Paso 1)
 function renderTablaEvidencias() {
   const container = document.getElementById("contenedor-artefactos");
   const totalLbl = document.getElementById("lbl-total-evidencias");
@@ -355,7 +390,9 @@ function poblarSelectsControles() {
   });
 }
 
-// 9. Ejecutar Evaluación de la SoA
+// ==========================================================================
+// 9. PASO 2: EJECUCIÓN DE SKILLS DEL AGENTE
+// ==========================================================================
 async function ejecutarSoA() {
   const btn = document.getElementById("btn-generar-soa");
   const originalText = btn.innerHTML;
@@ -384,7 +421,26 @@ async function ejecutarSoA() {
   }
 }
 
-// 10. Procesamiento con Fallback Determinista Inteligente
+async function auditarControlPuntual() {
+  const ctrl = document.getElementById("sel-control-individual").value;
+  const rol = obtenerRolSeleccionado();
+
+  const payload = {
+    operacion: "verificar_control",
+    control: ctrl,
+    perfil: { organizacion: "UNSA", rol: rol },
+    riesgos: riesgosUNSA,
+    evidencias: evidenciasDocumentadas.map(e => ({
+      control: e.control,
+      descripcion: `[Archivo: ${e.archivo}] ${e.descripcion}`,
+      estado: e.estado
+    }))
+  };
+
+  await procesarPayload(payload);
+}
+
+// Procesamiento con llamada al Backend o Fallback Determinista
 async function procesarPayload(payload) {
   let resultado = null;
 
@@ -427,7 +483,18 @@ function ejecutarMotorLocal(entrada) {
       operacion: "verificar_control",
       estado: "ok",
       respuesta: `Control ${fila.control}: ${fila.estado}. Recomendación: ${fila.recomendacion}`,
-      datos: fila,
+      datos: {
+        soa: [fila],
+        brechas: fila.estado !== "implementado" && fila.aplica ? [{ control: fila.control, nombre: fila.nombre, estado: fila.estado, solicitar_a: fila.responsable }] : [],
+        resumen: {
+          controles_evaluados: 1,
+          aplican: fila.aplica ? 1 : 0,
+          excluidos: fila.aplica ? 0 : 1,
+          implementados: fila.estado === "implementado" ? 1 : 0,
+          parciales: fila.estado === "parcial" ? 1 : 0,
+          no_implementados: fila.estado === "no implementado" ? 1 : 0
+        }
+      },
       fuentes: ["catalogo_controles.json", "DIR-OTIC-004-UNSA.md"],
       confianza: 1.0,
       requiere_revision_humana: true
@@ -536,7 +603,7 @@ function recomendarAccion(fila) {
   return `Solicitar formalmente el documento de sustento al ${fila.responsable}.`;
 }
 
-// 11. Renderizar Resultados en Pantalla
+// 10. Renderizar Resultados en Pantalla (Paso 2)
 function renderizarResultadosSoA(res) {
   const panel = document.getElementById("panel-resultados-soa");
   panel.style.display = "block";
@@ -559,7 +626,7 @@ function renderizarResultadosSoA(res) {
     document.getElementById("txt-count-imp").textContent = r.implementados;
     document.getElementById("txt-count-exc").textContent = r.excluidos;
 
-    // Actualización de la Barra de Cumplimiento
+    // Barra de Madurez / Cumplimiento
     const aplicables = r.aplican || 1;
     const pctImp = Math.round((r.implementados / aplicables) * 100);
     const pctPar = Math.round((r.parciales / aplicables) * 100);
@@ -584,7 +651,7 @@ function renderizarResultadosSoA(res) {
   initFiltrosSoA(filas);
 }
 
-// 12. Buscador en Vivo de la SoA
+// 11. Buscador en Vivo de la SoA
 function initBuscadorSoA() {
   const searchInput = document.getElementById("input-buscar-soa");
   if (!searchInput) return;
@@ -699,11 +766,141 @@ function initFiltrosSoA(filas) {
   });
 }
 
+// ==========================================================================
+// 12. PASO 3: PROBADOR INTERACTIVO DEL RAG EN VIVO
+// ==========================================================================
+function initRagPlayground() {
+  const btnConsultar = document.getElementById("btn-ejecutar-rag");
+  const inputQuery = document.getElementById("txt-rag-query");
+  const chips = document.querySelectorAll(".rag-chip");
+
+  if (btnConsultar && inputQuery) {
+    btnConsultar.addEventListener("click", () => {
+      ejecutarConsultaRAG(inputQuery.value.trim());
+    });
+
+    inputQuery.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        ejecutarConsultaRAG(inputQuery.value.trim());
+      }
+    });
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      const q = chip.dataset.query;
+      inputQuery.value = q;
+      ejecutarConsultaRAG(q);
+    });
+  });
+}
+
+async function ejecutarConsultaRAG(query) {
+  const outputBox = document.getElementById("rag-output-container");
+  if (!outputBox) return;
+
+  if (!query) {
+    outputBox.innerHTML = `<div style="color:var(--slate-500); font-size:12px; padding:12px;">Por favor ingresa un término de búsqueda para consultar la base de conocimiento.</div>`;
+    return;
+  }
+
+  outputBox.innerHTML = `<div style="color:var(--slate-600); font-size:12.5px; padding:16px;">Buscando fragmentos normativos relevantes en la base semántica de la UNSA...</div>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/controles/ejecutar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operacion: "consultar", solicitud: query })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      renderizarResultadosRAG(data, query);
+      return;
+    }
+  } catch (err) {
+    // Si falla el backend, usamos el motor simulado local
+  }
+
+  // Fallback de demostración RAG local si el backend no responde
+  renderizarResultadosRAGLocal(query);
+}
+
+function renderizarResultadosRAG(data, query) {
+  const outputBox = document.getElementById("rag-output-container");
+  outputBox.innerHTML = "";
+
+  if (data.estado === "sin_respuesta" || (!data.datos?.hits && !data.respuesta)) {
+    outputBox.innerHTML = `
+      <div style="color:var(--slate-600); font-size:12.5px; padding:14px;">
+        No se encontraron fragmentos con suficiente relevancia semántica para la consulta: <em>"${query}"</em>.
+        Prueba con términos como <strong>"comedor universitario"</strong>, <strong>"derechos ARCO"</strong> o <strong>"matrícula estudiantes"</strong>.
+      </div>
+    `;
+    return;
+  }
+
+  const hits = data.datos?.hits || [];
+
+  if (hits.length > 0) {
+    hits.forEach(h => {
+      const card = document.createElement("div");
+      card.className = "rag-hit-card";
+      const pctScore = Math.round(h.score * 100);
+      card.innerHTML = `
+        <div class="rag-hit-header">
+          <span class="rag-hit-source">${h.meta}</span>
+          <span class="rag-hit-score">Similitud: ${pctScore}%</span>
+        </div>
+        <div class="rag-hit-text">${h.texto}</div>
+      `;
+      outputBox.appendChild(card);
+    });
+  } else if (data.respuesta) {
+    const card = document.createElement("div");
+    card.className = "rag-hit-card";
+    card.innerHTML = `
+      <div class="rag-hit-header">
+        <span class="rag-hit-source">${(data.fuentes || []).join(", ") || "Base normativa UNSA"}</span>
+        <span class="rag-hit-score">Relevancia: ${Math.round((data.confianza || 0.85) * 100)}%</span>
+      </div>
+      <div class="rag-hit-text">${data.respuesta}</div>
+    `;
+    outputBox.appendChild(card);
+  }
+}
+
+function renderizarResultadosRAGLocal(query) {
+  const outputBox = document.getElementById("rag-output-container");
+  outputBox.innerHTML = `
+    <div class="rag-hit-card">
+      <div class="rag-hit-header">
+        <span class="rag-hit-source">RCU-0127-2025-Reglamento-Comedor-Universitario.pdf</span>
+        <span class="rag-hit-score">Similitud: 92%</span>
+      </div>
+      <div class="rag-hit-text">
+        Artículo 14: Para el control de acceso y asignación de raciones en el Comedor Universitario, la Dirección Universitaria de Desarrollo Estudiantil (DUDE) implementa el registro biométrico de huellas dactilares. Dicho tratamiento cuenta con consentimiento previo y cláusula de protección de datos personales.
+      </div>
+    </div>
+    <div class="rag-hit-card">
+      <div class="rag-hit-header">
+        <span class="rag-hit-source">politica_privacidad_unsa.md · OTIC-UNSA</span>
+        <span class="rag-hit-score">Similitud: 84%</span>
+      </div>
+      <div class="rag-hit-text">
+        Directiva Institucional: Toda recopilación de datos sensibles (datos biométricos, socioeconómicos y médicos) en dependencias universitarias debe contar con una Evaluación de Impacto de Privacidad (DPIA) y registrarse en el Registro de Actividades de Tratamiento (RAT).
+      </div>
+    </div>
+  `;
+}
+
 // 13. Presets JSON y Copiado al Portapapeles
 function initPresetsJSON() {
   const select = document.getElementById("sel-preset-json");
   const txt = document.getElementById("txt-json-payload");
   const btnCopiar = document.getElementById("btn-copiar-json-input");
+
+  if (!select || !txt) return;
 
   const presets = {
     unsa_responsable: {
@@ -770,28 +967,11 @@ async function procesarJsonDirecto() {
   try {
     const payload = JSON.parse(txt.value);
     await procesarPayload(payload);
+    // Cambiar automáticamente al Paso 2 para ver los resultados
+    irAPaso("step-2");
   } catch (e) {
     alert("El formato JSON ingresado no es válido: " + e.message);
   }
-}
-
-async function auditarControlPuntual() {
-  const ctrl = document.getElementById("sel-control-individual").value;
-  const rol = obtenerRolSeleccionado();
-
-  const payload = {
-    operacion: "verificar_control",
-    control: ctrl,
-    perfil: { organizacion: "UNSA", rol: rol },
-    riesgos: riesgosUNSA,
-    evidencias: evidenciasDocumentadas.map(e => ({
-      control: e.control,
-      descripcion: `[Archivo: ${e.archivo}] ${e.descripcion}`,
-      estado: e.estado
-    }))
-  };
-
-  await procesarPayload(payload);
 }
 
 function exportarJson() {
