@@ -49,9 +49,9 @@ def desde_carpeta(carpeta):
                 if p:
                     textos.append(p)
                     primera_linea = p.split("\n")[0].replace("#", "").strip()
-                    if ":" in primera_linea and len(primera_linea.split(":")[0]) < 80:
+                    if ":" in primera_linea and len(primera_linea.split(":")[0]) < 140:
                         meta_label = primera_linea.split(":")[0].strip()
-                    elif len(primera_linea) < 70:
+                    elif len(primera_linea) < 140:
                         meta_label = primera_linea
                     else:
                         meta_label = os.path.basename(ruta)

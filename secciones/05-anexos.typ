@@ -26,60 +26,45 @@ El catálogo normativo base mapea cada control del Anexo A con el agente especia
 ```markdown
 ---
 name: generar-soa
-description: Genera la Declaración de Aplicabilidad (SoA) del PIMS según ISO/IEC
-  27701:2025. Para cada control indica si aplica, la justificación, el estado de
-  implementación y las brechas. Usar cuando se pida elaborar, actualizar o revisar
-  la SoA.
+version: 2.1.0
+author: Escuela Profesional de Ingeniería de Sistemas - UNSA
+category: auditoria-sistemas-pims
+standard: ISO/IEC 27701:2025 (Harmonized Structure & Anexo A)
+description: Genera la Declaración de Aplicabilidad (SoA) formal, algorítmica y determinista del
+  PIMS conforme a ISO/IEC 27701:2025, contextualizada para la UNSA. Evalúa aplicabilidad por rol,
+  calcula estados probatorios estrictos, vincula directivas institucionales mediante búsqueda
+  semántica vectorial (FAISS) y emite la matriz de brechas con gobernanza humana obligatoria.
+tools:
+  - engine_regla_aplicabilidad
+  - engine_regla_estado_probatorio
+  - faiss_rag_politicas_retriever
+  - gap_matrix_analyzer
 ---
 
-# Generar la Declaración de Aplicabilidad (SoA)
+# SKILL-01: Generación de la Declaración de Aplicabilidad (SoA)
 
-## Activación
-Se ejecuta cuando:
-- Se solicita elaborar o actualizar la SoA de la organización.
-- Otro agente (Riesgos, Evidencia) entrega información nueva que puede cambiar
-  la aplicabilidad o el estado de los controles.
+## 1. Activación
+- Invocación desde el orquestador n8n mediante HTTP POST `/api/controles/ejecutar`.
+- Ciclo de auditoría global tras recopilación de artefactos del Agente de Evidencia.
+- Actualización de amenazas por el Agente de Riesgos.
 
-No se ejecuta para: consultas sobre un solo control (usar `verificar-controles`).
+## 2. Entrada (JSON Tipado)
+- perfil: { organizacion: string, rol: "responsable" | "encargado" | "ambos" }
+- riesgos: lista de { id: string, descripcion: string, controles: string[] }
+- evidencias: lista de { control: string, descripcion: string, estado: "implementado" | "parcial" }
 
-## Entrada
-- perfil: { organizacion, rol } con rol = responsable | encargado | ambos
-- riesgos: lista de { id, descripcion, controles[] }        (de Agente de Riesgos)
-- evidencias: lista de { control, descripcion, estado }      (de Agente de Evidencia)
-  con estado = implementado | parcial
-- base_politicas: repositorio corporativo de políticas y directivas (indexado en knowledge/politicas/)
+## 3. Algoritmo Operativo Estándar
+1. Validar perfil.rol; si es inválido, abortar con estado "rechazada".
+2. Cargar catálogo de controles (catalogo_controles.json).
+3. Evaluar aplicabilidad por rol: A.1 (responsable), A.2 (encargado), A.3 (común universal).
+4. Redactar justificación formal; asociar IDs de riesgos vinculados.
+5. Computar estado probatorio: implementado (≥1 evidencia "implementado"), parcial (solo evidencias "parcial"), no implementado (sin evidencias), no aplica (excluido).
+6. Búsqueda semántica FAISS sobre directivas de la UNSA (DIR-OTIC-004-UNSA).
+7. Identificar brechas y asignar solicitud al agente_responsable del catálogo.
+8. Consolidar totales estadísticos y establecer requiere_revision_humana = true.
 
-## Pasos
-1. Validar la entrada. Si falta perfil.rol o no es válido, rechazar con estado "rechazada".
-2. Cargar el catálogo de controles (control, nombre, agente responsable).
-3. Determinar la aplicabilidad de cada control según el rol:
-   - A.1 (responsable): aplica si rol = responsable o ambos.
-   - A.2 (encargado): aplica si rol = encargado o ambos.
-   - A.3 (común): aplica siempre.
-4. Redactar la justificación:
-   - Si aplica: motivo + riesgos vinculados (si los hay).
-   - Si no aplica: motivo de la exclusión (obligatorio).
-5. Determinar el estado de implementación SOLO con evidencias:
-   - implementado: existe al menos una evidencia "implementado".
-   - parcial: solo hay evidencias "parcial".
-   - no implementado: no hay evidencias.
-   - no aplica: control excluido.
-6. Buscar en el repositorio de políticas (búsqueda semántica) una política relacionada.
-7. Identificar brechas: controles aplicables no implementados, indicando a qué agente pedir evidencia.
-8. Armar la SoA y el resumen con totales estadísticos.
-9. Marcar requiere_revision_humana = true.
-
-## Salida
-{
-  "agente": "controles",
-  "operacion": "generar_soa",
-  "estado": "ok | rechazada",
-  "respuesta": "resumen en texto",
-  "datos": { "soa": [ ... ], "brechas": [ ... ], "resumen": { ... } },
-  "fuentes": ["catalogo_controles.json"],
-  "confianza": 1.0,
-  "requiere_revision_humana": true
-}
+## 4. Salida
+Contrato estándar JSON con { soa, brechas, resumen }, fuentes citadas, confianza 1.0 y bandera de supervisión humana obligatoria.
 ```
 
 === Skill `verificar-controles` (`skills/verificar-controles/SKILL.md`)
@@ -87,28 +72,42 @@ No se ejecuta para: consultas sobre un solo control (usar `verificar-controles`)
 ```markdown
 ---
 name: verificar-controles
-description: Verifica el estado de implementación de un control concreto del PIMS
-  (ISO/IEC 27701:2025), identifica la brecha y recomienda la siguiente acción.
+version: 2.1.0
+author: Escuela Profesional de Ingeniería de Sistemas - UNSA
+category: auditoria-sistemas-pims
+standard: ISO/IEC 27701:2025 (Harmonized Structure & Anexo A)
+description: Audita el estado de cumplimiento de un control individual del PIMS bajo ISO/IEC 27701:2025
+  para la UNSA. Evalúa su aplicabilidad, verifica evidencias documentales, asocia la política institucional
+  mediante RAG (FAISS) y genera una prescripción técnica accionable dirigida al agente correspondiente.
+tools:
+  - engine_regla_aplicabilidad
+  - engine_regla_estado_probatorio
+  - faiss_rag_politicas_retriever
+  - prescriptive_recommender
 ---
 
-# Verificar un control
+# SKILL-02: Verificación y Auditoría Puntual de Controles
 
-## Activación
-Se ejecuta cuando se pide revisar un control específico o saber qué falta para cumplirlo.
+## 1. Activación
+- Auditoría puntual sobre un control específico (ej. A.1.2.6 DPIA o A.3.12 CSIRT).
+- Inspección preliminar antes de auditorías de certificación externa.
 
-## Entrada
-- control: identificador (por ejemplo "A.1.2.6")
-- perfil: { rol }
-- riesgos y evidencias (mismo formato que en generar-soa)
+## 2. Entrada
+- control: identificador normativo exacto (ej. "A.1.2.6")
+- perfil: { organizacion, rol }
+- riesgos y evidencias: arreglos tipados con artefactos probatorios.
 
-## Pasos
-1. Validar existencia del control y rol válido.
-2. Determinar si el control aplica al rol.
-3. Reunir las evidencias del control.
-4. Buscar una política relacionada en el repositorio FAISS.
-5. Determinar estado (implementado / parcial / no implementado / no aplica).
-6. Recomendar la siguiente acción indicando el agente responsable.
-7. Devolver el resultado en el contrato estándar.
+## 3. Procedimiento y Prescripción Accionable
+1. Validar que el control exista en el catálogo y que el rol sea válido.
+2. Determinar aplicabilidad al rol de la organización.
+3. Evaluar estado probatorio determinista a partir de las evidencias del control.
+4. Recuperar directiva institucional de la UNSA asociada vía RAG vectorial.
+5. Formular prescripción prescriptiva:
+   - "no aplica": Documentar formalmente el motivo de exclusión en la SoA.
+   - "implementado": Mantener evidencia vigente para la auditoría interna (9.2).
+   - "parcial": Completar los requisitos pendientes con el agente responsable.
+   - "no implementado": Solicitar formalmente la implementación al agente responsable.
+6. Retornar fila diagnóstica tipada en contrato estándar con requiere_revision_humana = true.
 ```
 
 == Anexo C: Código Fuente Base

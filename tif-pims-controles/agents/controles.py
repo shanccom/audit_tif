@@ -4,7 +4,7 @@ import os
 from rag import desde_carpeta
 
 ROLES = ("responsable", "encargado", "ambos")
-UMBRAL_POLITICA = 0.45   # similitud mínima para citar una política relacionada
+UMBRAL_POLITICA = 0.30   # similitud mínima para citar una política relacionada
 UMBRAL_CONSULTA = 0.30   # similitud mínima para responder una consulta conceptual
 
 
@@ -22,7 +22,10 @@ class AgenteControles:
         "Actualiza la SoA con las nuevas evidencias",
     ]
 
-    def __init__(self, carpeta="knowledge"):
+    def __init__(self, carpeta=None):
+        if carpeta is None:
+            base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            carpeta = os.path.join(base, "knowledge")
         with open(os.path.join(carpeta, "catalogo_controles.json"), encoding="utf-8") as f:
             self.catalogo = json.load(f)
         self.normativa = desde_carpeta(os.path.join(carpeta, "normativa"))
