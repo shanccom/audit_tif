@@ -208,7 +208,7 @@ async function verificarConexionServidor() {
       servidorOnline = true;
       catalogoActual = await res.json();
       statusDot.className = "status-dot online";
-      statusText.textContent = "Servidor conectado (:5000)";
+      statusText.textContent = "Servidor conectado";
       serverAlert.style.display = "none";
       return;
     }
