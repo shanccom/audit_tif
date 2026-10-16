@@ -1,36 +1,58 @@
 import glob
 import os
-from functools import lru_cache
-
 import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
+import requests
+
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+EMBEDDING_MODEL = os.environ.get("OLLAMA_EMBED_MODEL", "all-minilm")
 
 
-@lru_cache(maxsize=1)
-def get_model():
-    # Modelo local multilingüe (funciona bien en español)
-    return SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+def obtener_embeddings(textos):
+    """
+    Genera embeddings vectoriales usando el servidor local de Ollama.
+    Utiliza el modelo liviano 'all-minilm' (384 dimensiones) 100% local.
+    """
+    if not textos:
+        return np.empty((0, 384), dtype="float32")
+
+    try:
+        resp = requests.post(
+            f"{OLLAMA_URL}/api/embed",
+            json={"model": EMBEDDING_MODEL, "input": textos},
+            timeout=45,
+        )
+        if resp.status_code == 200:
+            vecs = np.asarray(resp.json().get("embeddings", []), dtype="float32")
+            if vecs.ndim == 2 and vecs.shape[0] == len(textos):
+                # Normalizar para similitud coseno exacta (producto interno = coseno)
+                normas = np.linalg.norm(vecs, axis=1, keepdims=True)
+                normas[normas == 0] = 1.0
+                return vecs / normas
+    except Exception as e:
+        print(f"[RAG] Error conectando con Ollama embeddings: {e}")
+
+    # Fallback seguro con matriz vacía o ceros si no responde
+    return np.zeros((len(textos), 384), dtype="float32")
 
 
 class Indice:
-    """Índice vectorial: textos + metadatos, búsqueda por similitud."""
+    """Índice vectorial: textos + metadatos, búsqueda semántica por similitud con Ollama + FAISS."""
 
     def __init__(self, textos, metas):
         self.textos, self.metas = textos, metas
         self.index = None
         if not textos:
             return
-        vecs = get_model().encode(textos, normalize_embeddings=True)
-        self.index = faiss.IndexFlatIP(vecs.shape[1])  # producto interno = coseno
+        vecs = obtener_embeddings(textos)
+        dim = vecs.shape[1] if vecs.ndim == 2 else 384
+        self.index = faiss.IndexFlatIP(dim)  # producto interno con vectores normalizados = similitud coseno
         self.index.add(np.asarray(vecs, dtype="float32"))
 
     def buscar(self, consulta, k=3):
-        if self.index is None:
+        if self.index is None or not self.textos:
             return []
-        q = np.asarray(
-            get_model().encode([consulta], normalize_embeddings=True), dtype="float32"
-        )
+        q = obtener_embeddings([consulta])
         scores, ids = self.index.search(q, min(k, len(self.textos)))
         return [
             {"texto": self.textos[i], "meta": self.metas[i], "score": float(s)}

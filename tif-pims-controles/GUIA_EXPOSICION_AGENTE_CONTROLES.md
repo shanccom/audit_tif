@@ -129,7 +129,7 @@ flowchart LR
 >
 > 1. **Indexación Inteligente:** La función `desde_carpeta()` lee automáticamente todos los documentos normativos de la carpeta `knowledge/`: la directiva institucional de privacidad `DIR-OTIC-004-UNSA`, el resumen normativo de la norma ISO 27701:2025 y el catálogo maestro de controles. Segmenta el texto por párrafos y extrae metadatos jerárquicos.
 >
-> 2. **Modelo de Embeddings Multilingüe:** Empleamos `paraphrase-multilingual-MiniLM-L12-v2` mediante SentenceTransformers. Este modelo genera vectores densos de alta fidelidad para el español técnico.
+> 2. **Modelo de Embeddings Local en Ollama:** Empleamos `all-minilm` servido por Ollama local. Este modelo genera vectores densos de alta fidelidad para el español técnico.
 >
 > 3. **Indexación Vectorial con FAISS:** Usamos `faiss.IndexFlatIP` (Inner Product). Al normalizar previamente los vectores a norma unitaria L2, el producto interno equivale con exactitud matemática a la **similitud coseno**.
 >
@@ -137,7 +137,7 @@ flowchart LR
 >
 > Todo esto suena excelente en teoría, pero ¿cómo se ve en la práctica? Ahora viene la parte central de nuestra presentación: **Sergio ejecutará en vivo el sistema**, simulará una auditoría completa sobre la UNSA y demostrará la generación de la Declaración de Aplicabilidad."
 
-- **Palabras Clave de Impacto:** *Soberanía de datos, Retrieval-Augmented Generation (RAG), FAISS IndexFlatIP, Similitud Coseno, SentenceTransformers, Umbral de similitud $\theta$.*
+- **Palabras Clave de Impacto:** *Soberanía de datos, Retrieval-Augmented Generation (RAG), FAISS IndexFlatIP, Similitud Coseno, Ollama Local Embeddings, Umbral de similitud $\theta$.*
 - **Transición:** *"Y ahora, los dejo con Sergio, quien tomará el control para la demostración en vivo del sistema en tiempo real."*
 
 ---

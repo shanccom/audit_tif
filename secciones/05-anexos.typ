@@ -115,31 +115,29 @@ tools:
 === Módulo RAG Local (`rag.py`)
 
 ```python
-import glob
-import os
-from functools import lru_cache
-import faiss
-import numpy as np
-from sentence_transformers import SentenceTransformer
+import glob, os, requests, faiss, numpy as np
 
-@lru_cache(maxsize=1)
-def get_model():
-    return SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+
+def obtener_embeddings(textos):
+    r = requests.post(f"{OLLAMA_URL}/api/embed", json={"model": "all-minilm", "input": textos}, timeout=45)
+    vecs = np.asarray(r.json().get("embeddings", []), dtype="float32")
+    normas = np.linalg.norm(vecs, axis=1, keepdims=True)
+    normas[normas == 0] = 1.0
+    return vecs / normas
 
 class Indice:
     def __init__(self, textos, metas):
         self.textos, self.metas = textos, metas
         self.index = None
-        if not textos:
-            return
-        vecs = get_model().encode(textos, normalize_embeddings=True)
+        if not textos: return
+        vecs = obtener_embeddings(textos)
         self.index = faiss.IndexFlatIP(vecs.shape[1])
         self.index.add(np.asarray(vecs, dtype="float32"))
 
     def buscar(self, consulta, k=3):
-        if self.index is None:
-            return []
-        q = np.asarray(get_model().encode([consulta], normalize_embeddings=True), dtype="float32")
+        if self.index is None or not self.textos: return []
+        q = obtener_embeddings([consulta])
         scores, ids = self.index.search(q, min(k, len(self.textos)))
         return [
             {"texto": self.textos[i], "meta": self.metas[i], "score": float(s)}

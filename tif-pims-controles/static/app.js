@@ -684,7 +684,7 @@ async function auditarControlPuntual() {
   `;
 }
 
-// 10. Ventana 3: Buscador Semántico RAG & Hugging Face
+// 10. Ventana 3: Buscador Semántico RAG & Ollama Local
 function initBuscadorRAG() {
   const input = document.getElementById("txt-rag-query");
   const btn = document.getElementById("btn-rag-buscar");
@@ -712,13 +712,13 @@ async function ejecutarBusquedaRAG(query) {
     return;
   }
 
-  container.innerHTML = `<div style="text-align:center; color:var(--ink-muted); padding:25px;">Analizando consulta semántica y recuperando directivas con Hugging Face...</div>`;
+  container.innerHTML = `<div style="text-align:center; color:var(--ink-muted); padding:25px;">Analizando consulta semántica y recuperando directivas con Ollama...</div>`;
 
   let hits = [];
   let respuestaDirecta = "";
-  let motorUtilizado = "Modelo Hugging Face + Síntesis Determinista";
+  let motorUtilizado = "Ollama Local (all-minilm) + Síntesis Determinista";
 
-  // Intento vía API Backend Flask (SentenceTransformers, FAISS y Ollama si está activo)
+  // Intento vía API Backend Flask (Ollama embeddings + Ollama generativo)
   try {
     const resp = await fetch(`${API_BASE}/api/controles/ejecutar`, {
       method: "POST",
@@ -739,7 +739,7 @@ async function ejecutarBusquedaRAG(query) {
         hits = [{ meta: data.fuentes.join(", "), score: data.confianza || 0.85, texto: data.respuesta }];
       }
 
-      motorUtilizado = "Hugging Face (MiniLM-L12) + IA Generativa";
+      motorUtilizado = "Ollama Local (all-minilm + qwen2.5:0.5b)";
     }
   } catch (err) {}
 

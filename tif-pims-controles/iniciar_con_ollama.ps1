@@ -23,15 +23,21 @@ if (-not $ollamaActivo) {
     Start-Sleep -Seconds 3
 }
 
-# 2. Verificar modelo liviano
-Write-Host "`n[2/4] Verificando modelo de IA: $modelo..." -ForegroundColor Yellow
+# 2. Verificar modelos de IA en Ollama (generativo y embeddings)
+Write-Host "`n[2/4] Verificando modelos en Ollama: $modelo (generativo) y all-minilm (embeddings)..." -ForegroundColor Yellow
 try {
     $lista = ollama list
     if ($lista -notmatch "qwen2.5") {
-        Write-Host "Descargando modelo liviano ($modelo)... Esto solo ocurre la primera vez." -ForegroundColor Magenta
+        Write-Host "Descargando modelo liviano ($modelo)..." -ForegroundColor Magenta
         ollama pull $modelo
     } else {
-        Write-Host "Modelo $modelo listo y disponible." -ForegroundColor Green
+        Write-Host "Modelo generativo $modelo listo." -ForegroundColor Green
+    }
+    if ($lista -notmatch "all-minilm") {
+        Write-Host "Descargando modelo de embeddings (all-minilm)..." -ForegroundColor Magenta
+        ollama pull all-minilm
+    } else {
+        Write-Host "Modelo de embeddings all-minilm listo." -ForegroundColor Green
     }
 } catch {
     Write-Host "Advertencia: No se pudo verificar con ollama cli. Se intentara conexion directa por API." -ForegroundColor DarkYellow

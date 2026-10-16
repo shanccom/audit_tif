@@ -52,7 +52,7 @@
       </button>
       <button class="tab-trigger" data-tab="tab-rag">
         <span class="tab-step">3</span>
-        <span>Base Normativa (RAG & Hugging Face)</span>
+        <span>Base Normativa (RAG & Ollama)</span>
       </button>
     </nav>
 
@@ -309,18 +309,18 @@
     </section>
 
     <!-- ====================================================================
-         VENTANA 3: BASE NORMATIVA (RAG & HUGGING FACE)
+         VENTANA 3: BASE NORMATIVA (RAG & OLLAMA)
          ==================================================================== -->
     <section id="tab-rag" class="tab-view">
 
-      <!-- Apartado Especial: Modelo de IA de Hugging Face -->
+      <!-- Apartado Especial: Modelos de IA Local de Ollama -->
       <div class="hf-banner-clean">
         <div class="hf-banner-top">
-          <span class="hf-tag">Hugging Face Embeddings</span>
-          <span class="hf-model-name">sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2</span>
+          <span class="hf-tag">Ollama Local AI</span>
+          <span class="hf-model-name">ollama: qwen2.5:0.5b (Generación) + all-minilm (Embeddings)</span>
         </div>
         <p class="hf-banner-desc">
-          Para fundamentar las respuestas conceptuales y vincular las directivas institucionales de la UNSA, el sistema utiliza un modelo de representaciones semánticas densas alojado en <strong>Hugging Face</strong>.
+          Para fundamentar las respuestas conceptuales y vincular las directivas institucionales de la UNSA, el sistema utiliza el motor local de <strong>Ollama</strong> con embeddings semánticos y generación de lenguaje natural.
         </p>
 
         <div class="hf-features-grid">
