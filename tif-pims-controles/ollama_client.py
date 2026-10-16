@@ -10,7 +10,7 @@ import os
 import requests
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b")
 OLLAMA_TIMEOUT = int(os.environ.get("OLLAMA_TIMEOUT", "20"))
 
 # Prompt del sistema para el agente de controles

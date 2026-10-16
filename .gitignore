@@ -35,3 +35,12 @@ ENV/
 .idea/
 *.swp
 *.swo
+
+# Large model binaries and installers
+*.gguf
+*.bin
+*.exe
+*.zip
+.ollama/
+models/
+
