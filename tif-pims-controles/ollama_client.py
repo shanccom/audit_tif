@@ -7,20 +7,37 @@ para generar respuestas enriquecidas con IA generativa local.
 
 import json
 import os
+import time
 import requests
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b")
 OLLAMA_TIMEOUT = int(os.environ.get("OLLAMA_TIMEOUT", "20"))
 
-# Prompt del sistema para el agente de controles
+# Prompt del sistema para el agente de controles con blindaje normativo
 SYSTEM_PROMPT = """\
-Eres un asistente experto en auditoría de sistemas de gestión de privacidad \
-de la información (PIMS) según la norma ISO/IEC 27701:2025. \
-Trabajas para la Universidad Nacional de San Agustín de Arequipa (UNSA). \
-Tu rol es analizar controles de privacidad, evaluar evidencias documentales \
-y emitir recomendaciones técnicas precisas en español. \
-Responde de forma concisa, profesional y citando los controles normativos relevantes.\
+Eres un auditor y consultor experto en sistemas de gestión de privacidad \
+de la información (PIMS) según la norma ISO/IEC 27701:2025 y la Ley N° 29733 (Perú) \
+para la Universidad Nacional de San Agustín de Arequipa (UNSA).
+
+GLOSARIO NORMATIVO CRÍTICO (REGLAS CONCEPTUALES ESTRICTAS):
+1. SoA (Statement of Applicability): Es exclusivamente la "Declaración de Aplicabilidad" \
+(Cláusula 6.1.3 d de ISO/IEC 27701:2025). Es el documento oficial que identifica los controles del \
+Anexo A aplicables a la organización, justifica su inclusión o exclusión por rol (Responsable A.1 / \
+Encargado A.2) y refleja su estado de implementación. BAJO NINGUNA CIRCUNSTANCIA confundas SoA \
+con DSAR, ni con solicitudes de acceso, ni con derechos de los titulares.
+2. DSAR (Data Subject Access Request) / Derechos ARCO: Son las solicitudes individuales que presentan los \
+titulares de datos (acceso, rectificación, cancelación, oposición) ante la UNSA (odp@unsa.edu.pe).
+3. DPIA: Evaluación de Impacto en la Privacidad (Privacy Impact Assessment, control A.1.2.6).
+4. RAT: Registro de Actividades de Tratamiento de datos personales (control A.1.2.9).
+5. Rol PII Controller: Responsable del tratamiento (UNSA respecto a estudiantes, docentes, notas).
+6. Rol PII Processor: Encargado del tratamiento (procesa datos por encargo de terceros).
+
+INSTRUCCIONES DE RESPUESTA:
+- Responde siempre con precisión técnica y apego riguroso al estándar ISO/IEC 27701:2025.
+- Si el usuario consulta sobre el SoA, define con claridad la Declaración de Aplicabilidad de controles.
+- Cita las directivas y controles pertinentes sin inventar términos ni atribuir derechos al SoA.
+- Responde en español formal, estructurado y conciso.\
 """
 
 
@@ -33,12 +50,12 @@ def _disponible():
         return False
 
 
-def generar(prompt, system=None, temperature=0.3, max_tokens=1024):
+def generar(prompt, system=None, temperature=0.3, max_tokens=1024, retornar_metricas=False):
     """
     Genera una respuesta usando Ollama.
 
-    Devuelve el texto generado o None si Ollama no está disponible
-    (para que el agente pueda usar su lógica determinista como fallback).
+    Devuelve el texto generado (o dict con métricas si retornar_metricas=True)
+    o None si Ollama no está disponible.
     """
     if not _disponible():
         return None
@@ -54,6 +71,8 @@ def generar(prompt, system=None, temperature=0.3, max_tokens=1024):
         },
     }
 
+    t0 = time.time()
+    print(f"\033[96m[OLLAMA {OLLAMA_MODEL}]\033[0m 🚀 Inferencia local iniciada (max_tokens={max_tokens})...")
     try:
         resp = requests.post(
             f"{OLLAMA_URL}/api/generate",
@@ -61,9 +80,25 @@ def generar(prompt, system=None, temperature=0.3, max_tokens=1024):
             timeout=OLLAMA_TIMEOUT,
         )
         if resp.status_code == 200:
-            return resp.json().get("response", "").strip()
-    except Exception:
-        pass
+            data = resp.json()
+            texto = data.get("response", "").strip()
+            eval_count = data.get("eval_count", 0)
+            eval_dur_ns = data.get("eval_duration", 1)
+            t_seg = round(time.time() - t0, 2)
+            tps = round(eval_count / (eval_dur_ns / 1e9), 1) if eval_dur_ns > 0 else 0
+            print(f"\033[92m[OLLAMA {OLLAMA_MODEL}]\033[0m ✅ Inferencia completada en {t_seg}s ({eval_count} tokens a {tps} tok/s).")
+            if retornar_metricas:
+                return {
+                    "texto": texto,
+                    "prompt": prompt,
+                    "modelo": OLLAMA_MODEL,
+                    "tokens": eval_count,
+                    "velocidad_tps": tps,
+                    "tiempo_seg": t_seg
+                }
+            return texto
+    except Exception as e:
+        print(f"\033[91m[OLLAMA ERROR]\033[0m Error durante inferencia: {e}")
 
     return None
 
@@ -138,7 +173,7 @@ Genera un ANÁLISIS EJECUTIVO breve (máx. 150 palabras) que:
 3. Proponga las 2-3 acciones prioritarias inmediatas.
 Responde en español profesional.
 """
-    return generar(prompt, max_tokens=512)
+    return generar(prompt, max_tokens=512, retornar_metricas=True)
 
 
 def enriquecer_verificacion(fila_control):

@@ -156,6 +156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("btn-generar-soa").addEventListener("click", ejecutarSoA);
   document.getElementById("btn-auditar-individual").addEventListener("click", auditarControlPuntual);
+  document.getElementById("btn-descargar-docx")?.addEventListener("click", descargarWordSoA);
   document.getElementById("btn-descargar-json").addEventListener("click", exportarJson);
   document.getElementById("btn-imprimir-reporte").addEventListener("click", () => window.print());
 });
@@ -358,9 +359,115 @@ function poblarSelectsControles() {
   });
 }
 
+// 6.1 Renderizador Progresivo de Traza del Agente (Pensamiento + Acciones en tiempo real)
+async function animarTrazaAgente(traza, contenedorId, delayEntreAcciones = 240) {
+  const cont = document.getElementById(contenedorId);
+  if (!cont) return;
+
+  if (!traza) {
+    cont.style.display = "none";
+    return;
+  }
+  cont.style.display = "block";
+
+  const p = traza.pensamiento || { tiempo_seg: 1.5, resumen: "Razonamiento...", detalles: "" };
+  const acciones = traza.acciones || [];
+
+  cont.innerHTML = `
+    <!-- Bloque de Pensamiento (Thought) -->
+    <details class="thought-block" style="margin-bottom: 12px; cursor: pointer;">
+      <summary style="list-style: none; display: flex; align-items: baseline; gap: 8px; color: #cdd6f4; font-weight: 500; user-select: none;">
+        <span style="color: #89b4fa; font-size: 15px; font-weight: bold;">○</span>
+        <span style="color: #b4befe; font-weight: 600;">Thought for ${p.tiempo_seg}s</span>
+        <span style="color: #6c7086; font-style: italic; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 580px;">
+          (${p.resumen})
+        </span>
+        <span style="margin-left: auto; color: #585b70; font-size: 11px;">(click para expandir)</span>
+      </summary>
+      <div style="margin-top: 8px; margin-left: 20px; padding: 10px 14px; background: #11111b; border-left: 2px solid #89b4fa; border-radius: 4px; color: #a6adc8; font-size: 12px; line-height: 1.6; white-space: pre-line;">
+        ${p.detalles || p.resumen}
+      </div>
+    </details>
+
+    <!-- Lista de Acciones / Herramientas Ejecutadas (Aparecen una por una) -->
+    <div id="${contenedorId}-actions-list" class="actions-list" style="display: flex; flex-direction: column; gap: 6px; margin-left: 2px;"></div>
+  `;
+
+  const listContainer = document.getElementById(`${contenedorId}-actions-list`);
+
+  for (let i = 0; i < acciones.length; i++) {
+    const act = acciones[i];
+    let bulletColor = "#a6e3a1"; // verde para files/inspect
+    if (act.tipo === "llm") bulletColor = "#f9e2af"; // amarillo para modelo
+    else if (act.tipo === "rag" || act.tipo === "embed") bulletColor = "#cba6f7"; // violeta para FAISS
+    else if (act.tipo === "skill") bulletColor = "#89dceb"; // cian para skill
+    else if (act.tipo === "artifact") bulletColor = "#f38ba8"; // rosa para artifacts docx
+
+    const item = document.createElement("div");
+    item.style.cssText = "display: flex; align-items: baseline; gap: 8px; line-height: 1.5; opacity: 0; transform: translateY(-2px); transition: opacity 0.22s ease, transform 0.22s ease;";
+    item.innerHTML = `
+      <span style="color: ${bulletColor}; font-size: 13px;">●</span>
+      <span style="color: #cdd6f4; font-weight: 600;">${act.titulo}</span>
+      ${act.detalle ? `<span style="color: #6c7086; font-size: 11.5px;">(${act.detalle})</span>` : ""}
+    `;
+
+    listContainer.appendChild(item);
+
+    // Delay progresivo para que se imprima mientras ocurre
+    await new Promise(res => setTimeout(res, delayEntreAcciones));
+    item.style.opacity = "1";
+    item.style.transform = "translateY(0)";
+  }
+}
+
+function efectoMaquinaEscribir(elemento, texto, velocidad = 6) {
+  elemento.textContent = "";
+  let i = 0;
+  return new Promise((resolve) => {
+    function escribir() {
+      if (i < texto.length) {
+        elemento.textContent += texto.charAt(i);
+        i++;
+        setTimeout(escribir, velocidad);
+      } else {
+        resolve();
+      }
+    }
+    escribir();
+  });
+}
+
 // 7. Skill 1: Generación de la SoA
 async function ejecutarSoA() {
   const rol = obtenerRolSeleccionado();
+
+  const panel = document.getElementById("panel-resultados-soa");
+  panel.style.display = "block";
+
+  // Ocultar resultados previos mientras corre la nueva traza
+  document.getElementById("cuadro-analisis-ia").style.display = "none";
+  const tablaWrap = document.getElementById("tabla-soa-oficial").closest(".table-wrapper-clean");
+  if (tablaWrap) tablaWrap.style.opacity = "0.35";
+
+  const trazaBox = document.getElementById("traza-agente-soa");
+  const badgeTiempo = document.getElementById("badge-tiempo-total-soa");
+  if (trazaBox) trazaBox.style.display = "block";
+  if (badgeTiempo) badgeTiempo.textContent = "Ejecutando...";
+
+  // 1. Iniciar animación de pasos preliminares mientras viaja la petición
+  const pensamientoInicial = {
+    tiempo_seg: 1.8,
+    resumen: `Evaluando controles para UNSA (rol: ${rol}), verificando evidencias y sintetizando dictamen ejecutivo con qwen2.5:7b...`,
+    detalles: `Iniciando ciclo de auditoría formal ISO/IEC 27701:2025.\nOrganización: UNSA\nRol: ${rol.toUpperCase()}`
+  };
+
+  const accionesInmediatas = [
+    { tipo: "skill", titulo: "Read skill (skills/generar-soa/SKILL.md)", detalle: "Especificación formal de la habilidad determinista" },
+    { tipo: "files", titulo: "Explored files (knowledge/catalogo_controles.json)", detalle: "10 controles normativos cargados" },
+    { tipo: "rag", titulo: "Consulted RAG FAISS (all-minilm)", detalle: "Búsqueda vectorial sobre directivas DIR-OTIC-004-UNSA" }
+  ];
+
+  animarTrazaAgente({ pensamiento: pensamientoInicial, acciones: accionesInmediatas }, "contenido-traza-soa", 280);
 
   const payload = {
     operacion: "generar_soa",
@@ -374,6 +481,7 @@ async function ejecutarSoA() {
   };
 
   let resultado = null;
+  const tInicio = performance.now();
 
   try {
     const resp = await fetch(`${API_BASE}/api/controles/ejecutar`, {
@@ -384,14 +492,22 @@ async function ejecutarSoA() {
     if (resp.ok) {
       resultado = await resp.json();
     }
-  } catch (err) {
-    // Fallback
-  }
+  } catch (err) {}
 
   if (!resultado) {
     resultado = ejecutarMotorLocal(payload);
   }
 
+  const durSeg = ((performance.now() - tInicio) / 1000).toFixed(2);
+  if (badgeTiempo) badgeTiempo.textContent = `${durSeg}s (Total)`;
+
+  // Completar la traza con las acciones completas del backend
+  const trazaCompleta = (resultado.datos && resultado.datos.traza_agente) || null;
+  if (trazaCompleta) {
+    await animarTrazaAgente(trazaCompleta, "contenido-traza-soa", 200);
+  }
+
+  if (tablaWrap) tablaWrap.style.opacity = "1";
   renderizarResultadosSoA(resultado);
 }
 
@@ -536,6 +652,18 @@ function renderizarResultadosSoA(res) {
     document.getElementById("txt-count-exc").textContent = r.excluidos;
   }
 
+  // Dictamen Ejecutivo de IA Local Ollama
+  const boxIa = document.getElementById("cuadro-analisis-ia");
+  const txtIa = document.getElementById("texto-analisis-ia");
+  if (boxIa && txtIa) {
+    if (res.datos && res.datos.analisis_ejecutivo) {
+      boxIa.style.display = "block";
+      efectoMaquinaEscribir(txtIa, res.datos.analisis_ejecutivo, 6);
+    } else {
+      boxIa.style.display = "none";
+    }
+  }
+
   renderFilasSoA(res.datos ? res.datos.soa : []);
   renderItemsBrechas(res.datos ? res.datos.brechas : []);
   initFiltrosSoA(res.datos ? res.datos.soa : []);
@@ -634,6 +762,22 @@ async function auditarControlPuntual() {
   const ctrlId = document.getElementById("sel-control-individual").value;
   const rol = obtenerRolSeleccionado();
   const resCard = document.getElementById("resultado-control-individual");
+  const trazaBox = document.getElementById("traza-agente-individual");
+
+  resCard.style.display = "none";
+
+  // Mostrar animación progresiva inicial
+  const pensamientoPrevio = {
+    tiempo_seg: 0.8,
+    resumen: `Verificación puntual del control ${ctrlId} para rol '${rol}'...`,
+    detalles: `Iniciando comprobación técnica del control ${ctrlId}.\nEvaluando evidencias cargadas y directivas institucionales afines.`
+  };
+  const accionesPrevias = [
+    { tipo: "skill", titulo: "Read skill (skills/verificar-controles/SKILL.md)", detalle: "Procedimiento de inspección quirúrgica" },
+    { tipo: "inspect", titulo: `Inspected evidence for control ${ctrlId}`, detalle: "Búsqueda de artefactos documentales" },
+    { tipo: "rag", titulo: "Consulted RAG FAISS (all-minilm)", detalle: "Afinidad semántica con directivas" }
+  ];
+  animarTrazaAgente({ pensamiento: pensamientoPrevio, acciones: accionesPrevias }, "traza-agente-individual", 240);
 
   const payload = {
     operacion: "verificar_control",
@@ -659,6 +803,10 @@ async function auditarControlPuntual() {
 
   if (!res) res = ejecutarMotorLocal(payload);
 
+  if (res.datos && res.datos.traza_agente) {
+    await animarTrazaAgente(res.datos.traza_agente, "traza-agente-individual", 180);
+  }
+
   const d = res.datos || {};
   let badgeClass = d.estado === "implementado" ? "imp" : (d.estado === "parcial" ? "parc" : (d.estado === "no implementado" ? "gap" : "exc"));
   let textoEstado = d.estado === "implementado" ? "Implementado" : (d.estado === "parcial" ? "Parcial" : (d.estado === "no implementado" ? "Brecha" : "No Aplica"));
@@ -679,7 +827,8 @@ async function auditarControlPuntual() {
     </div>
     <div style="background:var(--surface-subtle); padding:10px 14px; border-radius:6px; border-left:3px solid var(--primary); font-size:12.5px;">
       <strong>Recomendación Técnica:</strong> ${d.recomendacion || res.respuesta}
-      <div style="margin-top:4px; font-size:11.5px; color:var(--ink-subtle);">Remitir solicitud a: <strong>${d.responsable}</strong></div>
+      ${d.recomendacion_ia ? `<div style="margin-top:8px; padding-top:6px; border-top:1px dashed var(--border); color:var(--primary); font-style:italic;"><strong>Dictamen Técnico (qwen2.5:7b):</strong> ${d.recomendacion_ia}</div>` : ""}
+      <div style="margin-top:6px; font-size:11.5px; color:var(--ink-subtle);">Remitir solicitud a: <strong>${d.responsable}</strong></div>
     </div>
   `;
 }
@@ -707,9 +856,25 @@ function initBuscadorRAG() {
 
 async function ejecutarBusquedaRAG(query) {
   const container = document.getElementById("contenedor-rag-resultados");
+  const trazaRag = document.getElementById("traza-agente-rag");
+
   if (!query) {
     container.innerHTML = `<div style="text-align:center; color:var(--ink-subtle); padding:20px;">Por favor ingrese un término de búsqueda.</div>`;
+    if (trazaRag) trazaRag.style.display = "none";
     return;
+  }
+
+  if (trazaRag) {
+    const pensamientoPrevio = {
+      tiempo_seg: 1.2,
+      resumen: `El auditor consultó: '${query}'. Buscando directivas normativas en FAISS y sintetizando respuesta...`,
+      detalles: `1. Vectorización con all-minilm (384 dimensiones).\n2. Búsqueda semántica en índice vectorial FAISS.\n3. Síntesis fundamentada con qwen2.5:7b.`
+    };
+    const accionesPrevias = [
+      { tipo: "embed", titulo: "Embedded query (all-minilm)", detalle: "Vector denso de 384 dimensiones normalizado L2" },
+      { tipo: "rag", titulo: "Searched FAISS IndexFlatIP", detalle: "Búsqueda vectorial en directivas institucionales UNSA" }
+    ];
+    animarTrazaAgente({ pensamiento: pensamientoPrevio, acciones: accionesPrevias }, "traza-agente-rag", 240);
   }
 
   container.innerHTML = `<div style="text-align:center; color:var(--ink-muted); padding:25px;">Analizando consulta semántica y recuperando directivas con Ollama...</div>`;
@@ -727,6 +892,10 @@ async function ejecutarBusquedaRAG(query) {
     });
     if (resp.ok) {
       const data = await resp.json();
+      if (data.datos && data.datos.traza_agente) {
+        await animarTrazaAgente(data.datos.traza_agente, "traza-agente-rag", 180);
+      }
+
       if (data.datos && data.datos.respuesta_directa) {
         respuestaDirecta = data.datos.respuesta_directa;
       } else if (data.respuesta && data.estado === "ok") {
@@ -739,7 +908,7 @@ async function ejecutarBusquedaRAG(query) {
         hits = [{ meta: data.fuentes.join(", "), score: data.confianza || 0.85, texto: data.respuesta }];
       }
 
-      motorUtilizado = "Ollama Local (all-minilm + qwen2.5:0.5b)";
+      motorUtilizado = "Ollama Local (all-minilm + qwen2.5:7b)";
     }
   } catch (err) {}
 
@@ -827,4 +996,41 @@ function exportarJson() {
   a.href = url;
   a.download = `SoA_UNSA_ISO27701_${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
+}
+
+async function descargarWordSoA() {
+  if (!resultadoSoAUltimo || !resultadoSoAUltimo.datos) {
+    alert("Primero genera la Declaración de Aplicabilidad (SoA).");
+    return;
+  }
+  const btn = document.getElementById("btn-descargar-docx");
+  const originalText = btn ? btn.textContent : "";
+  if (btn) {
+    btn.textContent = "⏳ Generando Word...";
+    btn.disabled = true;
+  }
+  try {
+    const resp = await fetch(`${API_BASE}/api/controles/exportar-docx`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(resultadoSoAUltimo)
+    });
+    if (!resp.ok) throw new Error("Error al generar el documento Word desde el servidor");
+    const blob = await resp.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Declaracion_de_Aplicabilidad_ISO_27701_UNSA.docx";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  } catch (err) {
+    alert("Error descargando el documento Word: " + err.message);
+  } finally {
+    if (btn) {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
 }

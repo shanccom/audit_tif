@@ -221,6 +221,26 @@
             </div>
           </div>
 
+          <!-- Traza de Pensamiento y Acciones del Agente (Agent Reasoning & Tool Trace) -->
+          <div id="traza-agente-soa" style="display:none; background:#181825; color:#cdd6f4; border:1px solid #313244; border-radius:8px; padding:16px; margin-bottom:20px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12.5px; box-shadow:0 4px 14px rgba(0,0,0,0.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #313244; padding-bottom:8px; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="display:inline-block; width:9px; height:9px; background:#a6e3a1; border-radius:50%; box-shadow:0 0 8px #a6e3a1;"></span>
+                <span style="font-weight:600; color:#89b4fa; letter-spacing:0.3px;">EXECUTION TRACE — AGENTE DE CONTROLES (ISO/IEC 27701:2025)</span>
+              </div>
+              <span id="badge-tiempo-total-soa" style="color:#6c7086; font-size:11px;">0.0s</span>
+            </div>
+            <div id="contenido-traza-soa"></div>
+          </div>
+
+          <!-- Dictamen Ejecutivo Técnico -->
+          <div id="cuadro-analisis-ia" class="brechas-card-clean" style="display:none; border-left: 4px solid #0284c7; background: #f8fafc; margin-bottom: 20px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <h4 style="margin:0; color:#0f172a; font-size:13.5px; font-weight:700;">Dictamen Ejecutivo de Privacidad (Evaluación SoA)</h4>
+            </div>
+            <p id="texto-analisis-ia" style="margin:0; font-size:13px; line-height:1.6; color:#334155; white-space:pre-line;"></p>
+          </div>
+
           <!-- Cuadro de Brechas Prescriptivas -->
           <div class="brechas-card-clean" id="cuadro-brechas">
             <h4>Plan de Remediación de Brechas Identificadas</h4>
@@ -237,6 +257,7 @@
               <button class="filter-pill-clean" data-filter="excluidos">Excluidos (<span id="txt-count-exc">0</span>)</button>
             </div>
             <div style="display: flex; gap: 8px;">
+              <button class="btn-primary-clean" id="btn-descargar-docx" style="background:#0284c7; color:#fff; border:none; padding:6px 12px; border-radius:4px; font-weight:600; cursor:pointer;">Descargar Word (.docx)</button>
               <button class="btn-secondary-clean" id="btn-descargar-json">Exportar JSON</button>
               <button class="btn-secondary-clean" id="btn-imprimir-reporte">Imprimir SoA</button>
             </div>
@@ -301,6 +322,9 @@
             </button>
           </div>
 
+          <!-- Traza de Pensamiento y Acciones del Agente para Auditoría Individual -->
+          <div id="traza-agente-individual" style="display:none; background:#181825; color:#cdd6f4; border:1px solid #313244; border-radius:8px; padding:14px; margin-bottom:16px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12px;"></div>
+
           <div id="resultado-control-individual" style="display: none;" class="single-result-card">
             <!-- Se llena al auditar -->
           </div>
@@ -317,7 +341,7 @@
       <div class="hf-banner-clean">
         <div class="hf-banner-top">
           <span class="hf-tag">Ollama Local AI</span>
-          <span class="hf-model-name">ollama: qwen2.5:0.5b (Generación) + all-minilm (Embeddings)</span>
+          <span class="hf-model-name">ollama: qwen2.5:7b (Generación) + all-minilm (Embeddings FAISS)</span>
         </div>
         <p class="hf-banner-desc">
           Para fundamentar las respuestas conceptuales y vincular las directivas institucionales de la UNSA, el sistema utiliza el motor local de <strong>Ollama</strong> con embeddings semánticos y generación de lenguaje natural.
@@ -364,6 +388,9 @@
             <button class="rag-chip" data-query="gestion de incidentes de seguridad brechas CSIRT">Gestión de Incidentes</button>
             <button class="rag-chip" data-query="contratos con terceros Google Workspace proveedores DPA">Terceros y Proveedores</button>
           </div>
+
+          <!-- Traza de Pensamiento y Acciones del Agente para Búsqueda RAG -->
+          <div id="traza-agente-rag" style="display:none; background:#181825; color:#cdd6f4; border:1px solid #313244; border-radius:8px; padding:14px; margin-bottom:16px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12px;"></div>
 
           <!-- Contenedor de Resultados RAG -->
           <div id="contenedor-rag-resultados" class="rag-results-stack">
